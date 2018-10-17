@@ -11,6 +11,8 @@ class exception : public std::exception {
     std::string message;
 
 public:
+    /// Constructor
+    /// @param message Message describing encountered error
     exception(const std::string& message) : message(message) {}
 
     /// Returns explanatory string.
