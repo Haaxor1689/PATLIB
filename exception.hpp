@@ -3,16 +3,16 @@
 #include <string>
 #include <exception>
 
-/// Default Patlib namespace
+/// Default Patlib namespace.
 namespace ptl {
 
-/// Patlib's exception class
+/// Patlib's exception class.
 class exception : public std::exception {
     std::string message;
 
 public:
-    /// Constructor
-    /// @param message Message describing encountered error
+    /// Constructor.
+    /// @param message Message describing encountered error.
     exception(const std::string& message) : message(message) {}
 
     /// Returns explanatory string.
