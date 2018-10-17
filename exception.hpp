@@ -3,7 +3,6 @@
 #include <string>
 #include <exception>
 
-/// Default Patlib namespace.
 namespace ptl {
 
 /// Patlib's exception class.
