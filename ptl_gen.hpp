@@ -16,7 +16,7 @@ template <class Tindex, class Tin_alph, class Tval_type, class Twt_type,
           class TCompetitive_multi_out_pat_manip,
           class TOutputs_of_a_pattern,
           class TWord_input_file>
-class Pass {
+class pass {
 
 protected:
     TTranslate& translate;
@@ -39,7 +39,7 @@ protected:
     hyphenation_type good_dot, bad_dot;
 
 public:
-    Pass(TTranslate& tra, const char* i_d_f_n,
+    pass(TTranslate& tra, const char* i_d_f_n,
          const Tval_type& l, const Tval_type& h,
          const Tindex& lhm, const Tindex& rhm,
          const Tindex& p_l, const Tindex& p_d,
@@ -269,7 +269,7 @@ template <class Tindex, class Tin_alph, class Tval_type, class Twt_type,
           class TCandidate_count_structure,
           class TCompetitive_multi_out_pat_manip,
           class TWord_input_file, class TPass>
-class Level {
+class level {
 
 protected:
     TTranslate& translate;
@@ -283,7 +283,7 @@ protected:
     Tcount_type good_wt, bad_wt, thresh;
 
 public:
-    Level(TTranslate& tra, const char* i_d_f_n,
+    level(TTranslate& tra, const char* i_d_f_n,
           const Tval_type& l, const Tval_type& h,
           const Tindex& lhm, const Tindex& rhm,
           TCompetitive_multi_out_pat_manip& p):
@@ -358,7 +358,7 @@ template <class Tindex, class Tin_alph, class Tval_type, class Twt_type,
           class TWord_input_file, class TWord_output_file,
           class TPattern_input_file, class TPattern_output_file,
           class TPass, class TLevel>
-class Generator {
+class generator {
 
 protected:
     TTranslate translate;
@@ -371,7 +371,7 @@ protected:
     Tindex left_hyphen_min, right_hyphen_min;
 
 public:
-    Generator(const char* dic, const char* pat,
+    generator(const char* dic, const char* pat,
               const char* out, const char* tra):
         translate(tra), word_input_file_name(dic),
         pattern_input_file_name(pat),

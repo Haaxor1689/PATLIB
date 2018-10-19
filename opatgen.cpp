@@ -1212,12 +1212,12 @@ TOutputs_of_a_pattern> TPattern_input_file;
 typedef Pattern_output_file<Tindex,Tin_alph,Tval_type,TTranslate,
 TOutputs_of_a_pattern> TPattern_output_file;
 
-typedef Pass<Tindex,Tin_alph,Tval_type,Twt_type,
+typedef pass<Tindex,Tin_alph,Tval_type,Twt_type,
 Tcount_type,THword,TTranslate,TCandidate_count_structure,
 TCompetitive_multi_out_pat_manip,TOutputs_of_a_pattern,
 TWord_input_file> TPass;
 
-typedef Level<Tindex,Tin_alph,Tval_type,Twt_type,
+typedef level<Tindex,Tin_alph,Tval_type,Twt_type,
 Tcount_type,THword,TTranslate,TCandidate_count_structure,
 TCompetitive_multi_out_pat_manip,TWord_input_file,TPass> TLevel;
 
@@ -1267,7 +1267,7 @@ print_banner();
 try{
 if(argc==5){
 utf_8= false;
-Generator<Tindex,Tin_alph,Tval_type,Twt_type,Tcount_type,THword,
+generator<Tindex,Tin_alph,Tval_type,Twt_type,Tcount_type,THword,
 TTranslate,TCandidate_count_structure,
 TCompetitive_multi_out_pat_manip,TOutputs_of_a_pattern,
 TWord_input_file,TWord_output_file,
@@ -1279,7 +1279,7 @@ g.do_all();
 else if(argc==6&&(0==strcmp(argv[1],"-u8"))){
 
 utf_8= true;
-Generator<Tindex,Tin_alph,Tval_type,Twt_type,Tcount_type,THword,
+generator<Tindex,Tin_alph,Tval_type,Twt_type,Tcount_type,THword,
 TTranslate,TCandidate_count_structure,
 TCompetitive_multi_out_pat_manip,TOutputs_of_a_pattern,
 TWord_input_file,TWord_output_file,
