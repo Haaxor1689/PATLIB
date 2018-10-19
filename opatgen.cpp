@@ -23,99 +23,52 @@ using namespace ptl;
 bool utf_8;
 
 template <class Tpm_pointer, class Tin_alph, class Tout_information>
-class IO_word_manipulator :
-        public trie_pattern_manipulator<Tpm_pointer, Tin_alph, Tout_information> {
-    /*5:*/
-#line 107 "opatgen.w"
+class IO_word_manipulator : public trie_pattern_manipulator<Tpm_pointer, Tin_alph, Tout_information> {
+    using base = trie_pattern_manipulator<Tpm_pointer, Tin_alph, Tout_information>;
 
 public:
-    IO_word_manipulator(const Tin_alph& max_i_a,
-                        const Tout_information& out_i_z,
-                        const unsigned& q_thr = 3):
-        trie_pattern_manipulator<Tpm_pointer, Tin_alph, Tout_information>
-        (max_i_a, out_i_z, q_thr) {}
+    IO_word_manipulator(const Tin_alph& max_i_a, const Tout_information& out_i_z, const unsigned& q_thr = 3) : base(max_i_a, out_i_z, q_thr) {}
 
-    /*:5*/
-#line 99 "opatgen.w"
-
-    /*6:*/
-#line 124 "opatgen.w"
-
-    void hard_insert_pattern(const vector<Tin_alph>& w,
-                             const Tout_information& o) {
-
-        Trie_pattern_manipulator<Tpm_pointer, Tin_alph,
-                                 Tout_information>::hard_insert_pattern(w, o);
+    void hard_insert_pattern(const vector<Tin_alph>& w, const Tout_information& o) {
+        trie_pattern_manipulator<Tpm_pointer, Tin_alph, Tout_information>::hard_insert_pattern(w, o);
     }
 
     void hard_insert_pattern(const Tin_alph& w, const Tout_information& o) {
         vector<Tin_alph> vec;
         vec.push_back(w);
 
-        Trie_pattern_manipulator<Tpm_pointer, Tin_alph,
-                                 Tout_information>::hard_insert_pattern(vec, o);
+        trie_pattern_manipulator<Tpm_pointer, Tin_alph, Tout_information>::hard_insert_pattern(vec, o);
     }
 
-    /*:6*/
-#line 100 "opatgen.w"
-
-    /*7:*/
-#line 148 "opatgen.w"
-
     void word_output(const vector<Tin_alph>& w, vector<Tout_information>& o) {
-
-        Trie_pattern_manipulator<Tpm_pointer, Tin_alph,
-                                 Tout_information>::word_output(w, o);
+        trie_pattern_manipulator<Tpm_pointer, Tin_alph, Tout_information>::word_output(w, o);
     }
 
     void word_output(const Tin_alph& w, Tout_information& o) {
         o = trie_outp[trie_root + w];
     }
 
-    /*:7*/
-#line 101 "opatgen.w"
-
 };
-
-/*:4*/ /*8:*/
-#line 174 "opatgen.w"
 
 template <class Texternal, class Tinternal>
 class IO_reverse_mapping {
 protected:
     map<Tinternal, vector<Texternal>> mapping;
-    /*9:*/
-#line 185 "opatgen.w"
 
 public:
     void insert(const Tinternal& i, const vector<Texternal>& v) {
         mapping[i] = v;
     }
 
-    /*:9*/
-#line 179 "opatgen.w"
-
-    /*10:*/
-#line 199 "opatgen.w"
-
-public:
     void add_to_string(const Tinternal& i, basic_string<Texternal>& s) {
         typename map<Tinternal, vector<Texternal>>::const_iterator it = mapping.find(i);
         s.insert(s.end(), it->second.begin(), it->second.end());
     }
 
-    /*:10*/
-#line 180 "opatgen.w"
-
 };
-
-/*:8*/ /*11:*/
-#line 223 "opatgen.w"
 
 template <class Tindex, class Tnum_type, class THword>
 class Translate {
-    /*12:*/
-#line 271 "opatgen.w"
 
 public:
     typedef enum {
@@ -139,30 +92,16 @@ protected:
     Tindex left_hyphen_min;
     Tindex right_hyphen_min;
 
-    IO_word_manipulator<Tindex, Tfile_unit, Tclassified_symbol>
-    classified_symbols;
+    IO_word_manipulator<Tindex, Tfile_unit, Tclassified_symbol> classified_symbols;
 
     IO_reverse_mapping<Tfile_unit, Tnum_type> xdig;
     IO_reverse_mapping<Tfile_unit, typename THword::hyphenation_type> xhyf;
     IO_reverse_mapping<Tfile_unit, Tnum_type> xext;
 
-    /*:12*/
-#line 227 "opatgen.w"
-
-    /*13:*/
-#line 305 "opatgen.w"
-
-protected:
     Tnum_type get_next_internal_code(void) {
         ++max_in_alph;
         return max_in_alph;
     }
-
-    /*:13*/
-#line 228 "opatgen.w"
-
-    /*14:*/
-#line 316 "opatgen.w"
 
 public:
     void classify(const Tfile_unit& c, Tclassified_symbol& o) {
@@ -172,12 +111,6 @@ public:
     void classify(const vector<Tfile_unit>& vc, Tclassified_symbol& o) {
         classified_symbols.word_last_output(vc, o);
     }
-
-    /*:14*/
-#line 230 "opatgen.w"
-
-    /*15:*/
-#line 335 "opatgen.w"
 
 protected:
     void prepare_fixed_defaults(void) {
@@ -201,13 +134,6 @@ protected:
         xext.insert(edge_of_word, edge_of_word_printable);
     }
 
-    /*:15*/
-#line 232 "opatgen.w"
-
-    /*16:*/
-#line 364 "opatgen.w"
-
-protected:
     void prepare_default_hyfs(void) {
         vector<Tfile_unit> repres;
 
@@ -228,13 +154,6 @@ protected:
         xhyf.insert(THword::past, repres);
     }
 
-    /*:16*/
-#line 233 "opatgen.w"
-
-    /*17:*/
-#line 388 "opatgen.w"
-
-protected:
     void prepare_default_alphabet(void) {
         vector<Tfile_unit> repres;
         Tnum_type internal;
@@ -251,13 +170,6 @@ protected:
         }
     }
 
-    /*:17*/
-#line 234 "opatgen.w"
-
-    /*18:*/
-#line 415 "opatgen.w"
-
-protected:
     void handle_preamble_of_translate(const basic_string<Tfile_unit>& s) {
         Tindex n = 0;
         bool bad = false;
@@ -330,7 +242,7 @@ protected:
             if (s.length() - 1 >= i + 3) {
                 classify(s[i + 3], cs);
                 if (utf_8 && s[i + 3] > 0x80) {
-                    throw exception("! Error reading translate file, In the first line, "
+                    throw ptl::exception("! Error reading translate file, In the first line, "
                         "specifying hyf characters:\n"
                         "In UTF-8 mode 8-bit symbol is not allowed.");
                 }
@@ -352,13 +264,6 @@ protected:
         }
     }
 
-    /*:18*/
-#line 235 "opatgen.w"
-
-    /*19:*/
-#line 521 "opatgen.w"
-
-protected:
     void handle_line_of_translate(basic_string<Tfile_unit>& s,
                                   const unsigned& lineno) {
         if (s.length() == 0)
@@ -386,9 +291,6 @@ protected:
             if (primary_repres)
                 internal = get_next_internal_code();
 
-            /*20:*/
-#line 559 "opatgen.w"
-
             {
                 Tclassified_symbol cs;
                 if (letter_repres.size() == 1) {
@@ -404,7 +306,7 @@ protected:
                     } else {
                         cerr << "! Error: Translate file, line " << lineno << ":" << endl;
                         cerr << "Trying to redefine previously defined character" << endl;
-                        throw exception("");
+                        throw ptl::exception("");
                     }
                 } else {
                     classify(*letter_repres.begin(), cs);
@@ -417,16 +319,14 @@ protected:
                         cerr << "The first symbol of multi-char or UTF-8 sequence has been ";
                         cerr << "used before";
                         cerr << endl << "as non-escape character" << endl;
-                        throw exception("");
+                        throw ptl::exception("");
                     }
                     classify(letter_repres, cs);
                     if (cs.first != invalid_class) {
                         cerr << "! Error: Translate file, line " << lineno << ":" << endl;
                         cerr << "Trying to redefine previously defined character" << endl;
-                        throw exception("");
+                        throw ptl::exception("");
                     }
-                    /*21:*/
-#line 609 "opatgen.w"
 
                     if (utf_8) {
                         Tfile_unit first = *letter_repres.begin();
@@ -441,30 +341,16 @@ protected:
                         }
                     }
 
-                    /*:21*/
-#line 598 "opatgen.w"
-
                     classified_symbols.hard_insert_pattern(letter_repres,
                                                            make_pair(letter_class, internal));
                 }
                 if (primary_repres)
                     xext.insert(internal, letter_repres);
             }
-
-            /*:20*/
-#line 547 "opatgen.w"
-
             primary_repres = false;
         }
     }
 
-    /*:19*/
-#line 236 "opatgen.w"
-
-    /*22:*/
-#line 631 "opatgen.w"
-
-protected:
     void read_translate(const char* tra) {
         unsigned lineno = 1;
         ifstream transl(tra);
@@ -486,12 +372,6 @@ protected:
                 << max_in_alph - edge_of_word << " letters" << endl;
     }
 
-    /*:22*/
-#line 237 "opatgen.w"
-
-    /*23:*/
-#line 659 "opatgen.w"
-
 public:
     Translate(const char* tra):
         max_in_alph(0),
@@ -501,13 +381,6 @@ public:
         read_translate(tra);
     }
 
-    /*:23*/
-#line 238 "opatgen.w"
-
-    /*24:*/
-#line 672 "opatgen.w"
-
-public:
     Tindex get_max_in_alph(void) {
         return max_in_alph;
     }
@@ -524,13 +397,6 @@ public:
         return edge_of_word;
     }
 
-    /*:24*/
-#line 240 "opatgen.w"
-
-    /*25:*/
-#line 699 "opatgen.w"
-
-public:
     void get_xdig(Tnum_type i, basic_string<Tfile_unit>& e) {
         basic_string<Tfile_unit> inv_rep;
         while (i > 0) {
@@ -540,40 +406,17 @@ public:
         e.append(inv_rep.rbegin(), inv_rep.rend());
     }
 
-    /*:25*/
-#line 241 "opatgen.w"
-
-    /*26:*/
-#line 714 "opatgen.w"
-
-public:
     void get_xhyf(const typename THword::hyphenation_type& i, basic_string<Tfile_unit>& e) {
         xhyf.add_to_string(i, e);
     }
 
-    /*:26*/
-#line 242 "opatgen.w"
-
-    /*27:*/
-#line 725 "opatgen.w"
-
-public:
     void get_xext(const Tnum_type& i, basic_string<Tfile_unit>& e) {
         xext.add_to_string(i, e);
     }
-
-    /*:27*/
-#line 243 "opatgen.w"
-
 };
-
-/*:11*/ /*28:*/
-#line 741 "opatgen.w"
 
 template <class THword, class TTranslate, class Tnum_type>
 class Word_input_file {
-    /*29:*/
-#line 758 "opatgen.w"
 
 protected:
     TTranslate& translate;
@@ -587,22 +430,10 @@ protected:
 
     Tnum_type global_word_wt;
 
-    /*:29*/
-#line 745 "opatgen.w"
-
-    /*30:*/
-#line 774 "opatgen.w"
-
 public:
     Word_input_file(TTranslate& t, const char* fn):
         translate(t), file_name(fn), file(file_name), lineno(0),
         global_word_wt(1) {}
-
-    /*:30*/
-#line 746 "opatgen.w"
-
-    /*31:*/
-#line 804 "opatgen.w"
 
 protected:
     void handle_line(const basic_string<Tfile_unit>& s, THword& hw) {
@@ -616,13 +447,7 @@ protected:
 
         do {
             if (utf_8 && (*i & 0x80)) {
-                /*32:*/
-#line 855 "opatgen.w"
-
                 {
-                    /*33:*/
-#line 893 "opatgen.w"
-
                     Tfile_unit first_i = *i;
                     seq.clear();
                     while ((first_i & 0x80) && (*i & 0x80)) {
@@ -631,10 +456,6 @@ protected:
                         ++i;
                         first_i = first_i << 1;
                     }
-
-                    /*:33*/
-#line 857 "opatgen.w"
-
                     translate.classify(seq, i_class);
                     if (i_class.first == TTranslate::letter_class) {
                         hw.push_back(i_class.second);
@@ -642,89 +463,45 @@ protected:
                     } else {
                         cerr << "! Error in " << file_name << " line " << lineno << ": "
                                 << "Multibyte sequence is invalid" << endl;
-                        throw exception("");
+                        throw ptl::exception("");
                     }
                 }
-
-                /*:32*/
-#line 818 "opatgen.w"
-
             } else {
                 translate.classify(*i, i_class);
                 switch (i_class.first) {
                 case TTranslate::space_class:
                     goto done;
                 case TTranslate::digit_class:
-                    /*34:*/
-#line 908 "opatgen.w"
-
                     if (i == s.begin()) {
-                        /*35:*/
-#line 922 "opatgen.w"
-
                         num = 0;
                         while (i_class.first == TTranslate::digit_class) {
                             num = 10 * num + i_class.second;
                             ++i;
                             translate.classify(*i, i_class);
                         }
-
-                        /*:35*/
-#line 910 "opatgen.w"
-
                         hw.weight[hw.size()] = num;
                         global_word_wt = num;
                     } else {
-                        /*35:*/
-#line 922 "opatgen.w"
-
                         num = 0;
                         while (i_class.first == TTranslate::digit_class) {
                             num = 10 * num + i_class.second;
                             ++i;
                             translate.classify(*i, i_class);
                         }
-
-                        /*:35*/
-#line 915 "opatgen.w"
-
                         hw.weight[hw.size()] = num;
                     }
-
-                    /*:34*/
-#line 826 "opatgen.w"
-
                     break;
                 case TTranslate::hyf_class:
-                    /*36:*/
-#line 934 "opatgen.w"
-
                     if (i_class.second == THword::correct || i_class.second == THword::past)
                         hw.type[hw.size()] = THword::correct;
                     ++i;
-
-                    /*:36*/
-#line 829 "opatgen.w"
-
                     break;
                 case TTranslate::letter_class:
-                    /*37:*/
-#line 941 "opatgen.w"
-
                     hw.push_back(i_class.second);
                     hw.weight[hw.size()] = global_word_wt;
                     ++i;
-
-                    /*:37*/
-#line 832 "opatgen.w"
-
                     break;
                 case TTranslate::escape_class:
-                    /*38:*/
-#line 958 "opatgen.w"
-
-                    /*39:*/
-#line 973 "opatgen.w"
 
                     seq.clear();
                     seq.push_back(*i);
@@ -744,9 +521,6 @@ protected:
                     }
                     translate.classify(seq, i_class);
 
-                    /*:39*/
-#line 959 "opatgen.w"
-
                     if (i_class.first == TTranslate::letter_class) {
                         hw.push_back(i_class.second);
                         hw.weight[hw.size()] = global_word_wt;
@@ -754,17 +528,14 @@ protected:
                         cerr << "! Error in " << file_name << " line " << lineno << ": "
                                 << "Escape sequence is invalid" << endl;
                         cerr << "(Are you using correct encoding--the -u8 switch?)" << endl;
-                        throw exception("");
+                        throw ptl::exception("");
                     }
-
-                    /*:38*/
-#line 835 "opatgen.w"
 
                     break;
                 default:
                     cerr << "! Error in " << file_name << " line " << lineno << ": "
                             << "Invalid character in input data" << endl;
-                    throw exception("");
+                    throw ptl::exception("");
                     break;
                 }
             }
@@ -774,12 +545,6 @@ protected:
         hw.weight[hw.size()] = global_word_wt;
         hw.weight[0] = global_word_wt;
     }
-
-    /*:31*/
-#line 747 "opatgen.w"
-
-    /*40:*/
-#line 997 "opatgen.w"
 
 public:
     bool get(THword& hw) {
@@ -795,19 +560,11 @@ public:
         return true;
     }
 
-    /*:40*/
-#line 748 "opatgen.w"
-
 };
-
-/*:28*/ /*41:*/
-#line 1025 "opatgen.w"
 
 template <class Tindex, class Tin_alph, class Tval_type,
           class TTranslate, class TOutputs_of_a_pattern>
 class Pattern_input_file {
-    /*42:*/
-#line 1038 "opatgen.w"
 
 protected:
     TTranslate& translate;
@@ -819,21 +576,9 @@ protected:
     typedef typename TTranslate::Tfile_unit Tfile_unit;
     typedef typename TTranslate::Tclassified_symbol Tclassified_symbol;
 
-    /*:42*/
-#line 1030 "opatgen.w"
-
-    /*43:*/
-#line 1051 "opatgen.w"
-
 public:
     Pattern_input_file(TTranslate& t, const char* fn):
         translate(t), file_name(fn), file(file_name), lineno(0) {}
-
-    /*:43*/
-#line 1031 "opatgen.w"
-
-    /*44:*/
-#line 1061 "opatgen.w"
 
 protected:
     void handle_line(const basic_string<Tfile_unit>& s, vector<Tin_alph>& v,
@@ -851,11 +596,7 @@ protected:
                 ++i;
                 continue;
             }
-            if (utf_8 && *i > 127) /*45:*/
-#line 1106 "opatgen.w"
-            {
-                /*33:*/
-#line 893 "opatgen.w"
+            if (utf_8 && *i > 127) {
 
                 Tfile_unit first_i = *i;
                 seq.clear();
@@ -866,9 +607,6 @@ protected:
                     first_i = first_i << 1;
                 }
 
-                /*:33*/
-#line 1108 "opatgen.w"
-
                 translate.classify(seq, i_class);
                 if (i_class.first == TTranslate::letter_class) {
                     v.push_back(i_class.second);
@@ -876,24 +614,14 @@ protected:
                 } else {
                     cerr << "! Error in " << file_name << " line " << lineno << ": "
                             << "Multibyte sequence is invalid" << endl;
-                    throw exception("");
+                    throw ptl::exception("");
                 }
-            }
-
-                /*:45*/
-#line 1079 "opatgen.w"
-
-            else {
+            } else {
                 translate.classify(*i, i_class);
                 switch (i_class.first) {
                 case TTranslate::space_class:
                     goto done;
                 case TTranslate::digit_class:
-                    /*46:*/
-#line 1123 "opatgen.w"
-
-                    /*35:*/
-#line 922 "opatgen.w"
 
                     num = 0;
                     while (i_class.first == TTranslate::digit_class) {
@@ -902,33 +630,17 @@ protected:
                         translate.classify(*i, i_class);
                     }
 
-                    /*:35*/
-#line 1124 "opatgen.w"
-
                     o.insert(make_pair(chars_read, num));
-
-                    /*:46*/
-#line 1086 "opatgen.w"
 
                     break;
                 case TTranslate::letter_class:
-                    /*47:*/
-#line 1129 "opatgen.w"
 
                     v.push_back(i_class.second);
                     ++chars_read;
                     ++i;
 
-                    /*:47*/
-#line 1089 "opatgen.w"
-
                     break;
                 case TTranslate::escape_class:
-                    /*48:*/
-#line 1136 "opatgen.w"
-
-                    /*39:*/
-#line 973 "opatgen.w"
 
                     seq.clear();
                     seq.push_back(*i);
@@ -948,9 +660,6 @@ protected:
                     }
                     translate.classify(seq, i_class);
 
-                    /*:39*/
-#line 1137 "opatgen.w"
-
                     if (i_class.first == TTranslate::letter_class) {
                         v.push_back(i_class.second);
                         ++chars_read;
@@ -958,28 +667,19 @@ protected:
                         cerr << "! Error in " << file_name << " line " << lineno << ": "
                                 << "Escape sequence is invalid" << endl;
                         cerr << "(Are you using correct encoding--the -u8 switch?)" << endl;
-                        throw exception("");
+                        throw ptl::exception("");
                     }
-
-                    /*:48*/
-#line 1092 "opatgen.w"
 
                     break;
                 default:
                     cerr << "! Error in " << file_name << " line " << lineno << ": "
                             << "Invalid character in pattern data" << endl;
-                    throw exception("");
+                    throw ptl::exception("");
                 }
             }
         } while (i != s.end());
     done:;
     }
-
-    /*:44*/
-#line 1032 "opatgen.w"
-
-    /*49:*/
-#line 1154 "opatgen.w"
 
 public:
     bool get(vector<Tin_alph>& v, TOutputs_of_a_pattern& o) {
@@ -996,18 +696,10 @@ public:
         return true;
     }
 
-    /*:49*/
-#line 1033 "opatgen.w"
-
 };
-
-/*:41*/ /*50:*/
-#line 1180 "opatgen.w"
 
 template <class Tindex, class THword, class TTranslate>
 class Word_output_file {
-    /*51:*/
-#line 1194 "opatgen.w"
 
 protected:
     TTranslate& translate;
@@ -1019,21 +711,9 @@ protected:
     unsigned last_global_word_wt;
     unsigned global_word_wt;
 
-    /*:51*/
-#line 1183 "opatgen.w"
-
-    /*52:*/
-#line 1207 "opatgen.w"
-
 public:
     Word_output_file(TTranslate& t, const char* fn):
         translate(t), file_name(fn), file(file_name), last_global_word_wt(1) {}
-
-    /*:52*/
-#line 1184 "opatgen.w"
-
-    /*53:*/
-#line 1221 "opatgen.w"
 
 public:
     void put(THword& hw) {
@@ -1058,19 +738,11 @@ public:
         file << s << endl;
     }
 
-    /*:53*/
-#line 1185 "opatgen.w"
-
 };
-
-/*:50*/ /*54:*/
-#line 1256 "opatgen.w"
 
 template <class Tindex, class Tin_alph, class Tval_type,
           class TTranslate, class TOutputs_of_a_pattern>
 class Pattern_output_file {
-    /*55:*/
-#line 1268 "opatgen.w"
 
 protected:
     TTranslate& translate;
@@ -1079,21 +751,9 @@ protected:
 
     typedef typename TTranslate::Tfile_unit Tfile_unit;
 
-    /*:55*/
-#line 1261 "opatgen.w"
-
-    /*56:*/
-#line 1279 "opatgen.w"
-
 public:
     Pattern_output_file(TTranslate& t, const char* fn):
         translate(t), file_name(fn), file(file_name) {}
-
-    /*:56*/
-#line 1262 "opatgen.w"
-
-    /*57:*/
-#line 1289 "opatgen.w"
 
 public:
     void put(const vector<Tin_alph>& v, const TOutputs_of_a_pattern& o) {
@@ -1103,41 +763,25 @@ public:
 
         for (typename vector<Tin_alph>::const_iterator vi = v.begin();
              vi != v.end(); ++vi) {
-            /*58:*/
-#line 1311 "opatgen.w"
 
             oi = o.find(pos);
             if (oi != o.end()) {
                 translate.get_xdig(oi->second, s);
             }
 
-            /*:58*/
-#line 1299 "opatgen.w"
-
             ++pos;
             translate.get_xext(*vi, s);
         }
-        /*58:*/
-#line 1311 "opatgen.w"
 
         oi = o.find(pos);
         if (oi != o.end()) {
             translate.get_xdig(oi->second, s);
         }
 
-        /*:58*/
-#line 1303 "opatgen.w"
-
         file << s << endl;
     }
 
-    /*:57*/
-#line 1263 "opatgen.w"
-
 };
-
-/*:54*/ /*59:*/
-#line 1346 "opatgen.w"
 
 typedef unsigned long Tindex;
 typedef unsigned Tin_alph;
@@ -1178,9 +822,6 @@ typedef level<Tindex, Tin_alph, Tval_type, Twt_type,
               Tcount_type, THword, TTranslate, TCandidate_count_structure,
               TCompetitive_multi_out_pat_manip, TWord_input_file, TPass> TLevel;
 
-/*:59*/ /*60:*/
-#line 1392 "opatgen.w"
-
 void print_banner(void) {
     cout << endl;
     cout << "Written and maintained by David Antos, xantos (at) fi.muni.cz" << endl;
@@ -1191,9 +832,6 @@ void print_banner(void) {
     cout << "FOR A PARTICULAR PURPOSE." << endl << endl;
     cout << "Thank you for using free software!" << endl << endl;
 }
-
-/*:60*/ /*61:*/
-#line 1407 "opatgen.w"
 
 int main(int argc, char* argv[]) {
     cout << "This is OPATGEN, version " << opatgen_version << endl;
