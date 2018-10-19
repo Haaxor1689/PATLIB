@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <vector>
 
 #include "exception.hpp"
 
@@ -16,19 +17,19 @@ template <class Tindex, class Tin_alph, class Tval_type, class Twt_type,
           class TPass, class TLevel>
 class generator {
 
-protected:
     TTranslate translate;
-    const char* name;
-    const char* word_input_file_name;
-    const char* pattern_input_file_name;
-    const char* pattern_output_file_name;
+    const std::string name;
+    const std::string word_input_file_name;
+    const std::string pattern_input_file_name;
+    const std::string pattern_output_file_name;
     TCompetitive_multi_out_pat_manip patterns;
-    Tval_type hyph_start, hyph_finish;
-    Tindex left_hyphen_min, right_hyphen_min;
+    Tval_type hyph_start;
+    Tval_type hyph_finish;
+    Tindex left_hyphen_min;
+    Tindex right_hyphen_min;
 
 public:
-    generator(const char* dic, const char* pat,
-              const char* out, const char* tra):
+    generator(const std::string& dic, const std::string& pat, const std::string& out, const std::string& tra):
         translate(tra), word_input_file_name(dic),
         pattern_input_file_name(pat),
         pattern_output_file_name(out),
@@ -41,8 +42,7 @@ public:
             std::cin >> hyph_finish;
             if ((hyph_start < 1) || (hyph_finish < 1)) {
                 hyph_start = 0;
-                std::cout << "Specify two integers satisfying 1<=hyph_start, hyph_finish "
-                        << std::endl;
+                std::cout << "Specify two integers satisfying 1<=hyph_start, hyph_finish " << std::endl;
             }
         } while (hyph_start < 1);
     }
@@ -78,7 +78,6 @@ public:
         }
     }
 
-public:
     void hyphenate_word_list() {
         std::string s;
         std::cout << "hyphenate word list <y/n>? ";
@@ -92,7 +91,7 @@ public:
         Tval_type fake_level_value = 2 * ((level_value / 2) + 1);
 
         char file_name[100];
-        sprintf(file_name, "pattmp.%d", level_value);
+        sprintf_s(file_name, "pattmp.%d", level_value);
         std::cout << "Writing file " << file_name << std::endl;
 
         THword w;
@@ -112,7 +111,6 @@ public:
         pass.print_pass_statistics();
     }
 
-public:
     void do_all() {
         read_patterns();
         std::cout << patterns.get_pat_count() << " pattern lines read in" << std::endl;
