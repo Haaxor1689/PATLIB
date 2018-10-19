@@ -45,7 +45,7 @@ TWord_input_file word_input;
 
 Tindex hyf_min,hyf_max,hyf_len;
 Tindex dot_min,dot_max,dot_len;
-typename THword::Thyf_type good_dot,bad_dot;
+typename THword::hyphenation_type good_dot,bad_dot;
 
 
 /*:81*/
@@ -80,11 +80,11 @@ if(dot_min<hyf_min)dot_min= hyf_min;
 if(dot_max<hyf_max)dot_max= hyf_max;
 dot_len= dot_min+dot_max;
 if(hyph_level%2==1){
-good_dot= THword::is_hyf;
-bad_dot= THword::no_hyf;
+good_dot= THword::correct;
+bad_dot= THword::none;
 }else{
-good_dot= THword::err_hyf;
-bad_dot= THword::found_hyf;
+good_dot= THword::wrong;
+bad_dot= THword::past;
 }
 }
 
@@ -103,7 +103,7 @@ typename TOutputs_of_a_pattern::iterator i;
 patterns.competitive_pattern_output(w,o,hopeless_hyph_val);
 
 for(i= o.begin();i!=o.end();i++){
-w.hval[i->first]= i->second;
+w.level[i->first]= i->second;
 }
 
 patterns.competitive_pattern_output(w,o,hopeless_hyph_val+1);
@@ -141,19 +141,19 @@ public:
 void change_dots(THword&w)
 {
 for(Tindex i= w.size()-hyf_max;i>=hyf_min;i--){
-if(w.hval[i]%2==1){
-if(w.dots[i]==THword::no_hyf)
-w.dots[i]= THword::err_hyf;
-else if(w.dots[i]==THword::is_hyf)
-w.dots[i]= THword::found_hyf;
+if(w.level[i]%2==1){
+if(w.type[i]==THword::none)
+w.type[i]= THword::wrong;
+else if(w.type[i]==THword::correct)
+w.type[i]= THword::past;
 }
 
-if(w.dots[i]==THword::found_hyf)
-good_count+= w.dotw[i];
-else if(w.dots[i]==THword::err_hyf)
-bad_count+= w.dotw[i];
-else if(w.dots[i]==THword::is_hyf)
-miss_count+= w.dotw[i];
+if(w.type[i]==THword::past)
+good_count+= w.weight[i];
+else if(w.type[i]==THword::wrong)
+bad_count+= w.weight[i];
+else if(w.type[i]==THword::correct)
+miss_count+= w.weight[i];
 }
 }
 
@@ -171,7 +171,7 @@ for(Tindex dpos= w.size()-dot_max;dpos>=dot_min;dpos--){
 #line 2238 "patlib.w"
 
 if(w.no_more[dpos])continue;
-if((w.dots[dpos]!=good_dot)&&(w.dots[dpos]!=bad_dot))continue;
+if((w.type[dpos]!=good_dot)&&(w.type[dpos]!=bad_dot))continue;
 
 /*:86*/
 #line 2217 "patlib.w"
@@ -184,11 +184,11 @@ spos++;
 vector<Tin_alph> subw;
 for(Tindex i= spos;i<=fpos;i++)subw.push_back(w[i]);
 
-if(w.dots[dpos]==good_dot){
-candidates.increment_counts(subw,w.dotw[dpos],0);
+if(w.type[dpos]==good_dot){
+candidates.increment_counts(subw,w.weight[dpos],0);
 }
 else{
-candidates.increment_counts(subw,0,w.dotw[dpos]);
+candidates.increment_counts(subw,0,w.weight[dpos]);
 }
 }
 }

@@ -150,7 +150,7 @@ IO_word_manipulator<Tindex,Tfile_unit,Tclassified_symbol>
 classified_symbols;
 
 IO_reverse_mapping<Tfile_unit,Tnum_type> xdig;
-IO_reverse_mapping<Tfile_unit,typename THword::Thyf_type> xhyf;
+IO_reverse_mapping<Tfile_unit,typename THword::hyphenation_type> xhyf;
 IO_reverse_mapping<Tfile_unit,Tnum_type> xext;
 
 /*:12*/
@@ -222,17 +222,17 @@ void prepare_default_hyfs(void){
 vector<Tfile_unit> repres;
 
 classified_symbols.hard_insert_pattern('.',make_pair(hyf_class,
-THword::err_hyf));
+THword::wrong));
 repres.clear();repres.push_back('.');
-xhyf.insert(THword::err_hyf,repres);
+xhyf.insert(THword::wrong,repres);
 classified_symbols.hard_insert_pattern('-',make_pair(hyf_class,
-THword::is_hyf));
+THword::correct));
 repres.clear();repres.push_back('-');
-xhyf.insert(THword::is_hyf,repres);
+xhyf.insert(THword::correct,repres);
 classified_symbols.hard_insert_pattern('*',make_pair(hyf_class,
-THword::found_hyf));
+THword::past));
 repres.clear();repres.push_back('*');
-xhyf.insert(THword::found_hyf,repres);
+xhyf.insert(THword::past,repres);
 }
 
 /*:16*/
@@ -317,7 +317,7 @@ cout<<"Specify 1<=left_hyphen_min, right_hyphen_min!"<<endl;
 }while(!n1> 0);
 }
 
-for(Tindex i= THword::err_hyf;i<=THword::found_hyf;i++){
+for(Tindex i= THword::wrong;i<=THword::past;i++){
 
 if(s.length()-1>=i+3){
 classify(s[i+3],cs);
@@ -331,7 +331,7 @@ if(cs.first==invalid_class){
 
 vector<Tfile_unit> v;
 v.push_back(s[i+3]);
-xhyf.insert((typename THword::Thyf_type)i,v);
+xhyf.insert((typename THword::hyphenation_type)i,v);
 classified_symbols.hard_insert_pattern(s[i+3],
 make_pair(hyf_class,i));
 }else{
@@ -544,7 +544,7 @@ e.append(inv_rep.rbegin(),inv_rep.rend());
 #line 714 "opatgen.w"
 
 public:
-void get_xhyf(const typename THword::Thyf_type&i,basic_string<Tfile_unit> &e)
+void get_xhyf(const typename THword::hyphenation_type&i,basic_string<Tfile_unit> &e)
 {
 xhyf.add_to_string(i,e);
 }
@@ -610,7 +610,7 @@ protected:
 void handle_line(const basic_string<Tfile_unit> &s,THword&hw)
 {
 hw.push_back(translate.get_edge_of_word());
-hw.dotw[hw.size()]= global_word_wt;
+hw.weight[hw.size()]= global_word_wt;
 
 Tclassified_symbol i_class;
 basic_string<Tfile_unit> ::const_iterator i= s.begin();
@@ -642,7 +642,7 @@ first_i= first_i<<1;
 translate.classify(seq,i_class);
 if(i_class.first==TTranslate::letter_class){
 hw.push_back(i_class.second);
-hw.dotw[hw.size()]= global_word_wt;
+hw.weight[hw.size()]= global_word_wt;
 }
 else{
 cerr<<"! Error in "<<file_name<<" line "<<lineno<<": "
@@ -679,7 +679,7 @@ translate.classify(*i,i_class);
 /*:35*/
 #line 910 "opatgen.w"
 
-hw.dotw[hw.size()]= num;
+hw.weight[hw.size()]= num;
 global_word_wt= num;
 }
 else{
@@ -697,7 +697,7 @@ translate.classify(*i,i_class);
 /*:35*/
 #line 915 "opatgen.w"
 
-hw.dotw[hw.size()]= num;
+hw.weight[hw.size()]= num;
 }
 
 /*:34*/
@@ -708,8 +708,8 @@ case TTranslate::hyf_class:
 /*36:*/
 #line 934 "opatgen.w"
 
-if(i_class.second==THword::is_hyf||i_class.second==THword::found_hyf)
-hw.dots[hw.size()]= THword::is_hyf;
+if(i_class.second==THword::correct||i_class.second==THword::past)
+hw.type[hw.size()]= THword::correct;
 i++;
 
 /*:36*/
@@ -721,7 +721,7 @@ case TTranslate::letter_class:
 #line 941 "opatgen.w"
 
 hw.push_back(i_class.second);
-hw.dotw[hw.size()]= global_word_wt;
+hw.weight[hw.size()]= global_word_wt;
 i++;
 
 /*:37*/
@@ -758,7 +758,7 @@ translate.classify(seq,i_class);
 
 if(i_class.first==TTranslate::letter_class){
 hw.push_back(i_class.second);
-hw.dotw[hw.size()]= global_word_wt;
+hw.weight[hw.size()]= global_word_wt;
 }
 else{
 cerr<<"! Error in "<<file_name<<" line "<<lineno<<": "
@@ -781,8 +781,8 @@ break;
 }while(i!=s.end());
 done:
 hw.push_back(translate.get_edge_of_word());
-hw.dotw[hw.size()]= global_word_wt;
-hw.dotw[0]= global_word_wt;
+hw.weight[hw.size()]= global_word_wt;
+hw.weight[0]= global_word_wt;
 }
 
 /*:31*/
@@ -1066,21 +1066,21 @@ void put(THword&hw)
 {
 basic_string<Tfile_unit> s;
 
-global_word_wt= hw.dotw[0];
+global_word_wt= hw.weight[0];
 if(last_global_word_wt!=global_word_wt){
-translate.get_xdig(hw.dotw[0],s);
+translate.get_xdig(hw.weight[0],s);
 last_global_word_wt= global_word_wt;
 }
 
-if(hw.dots[1]!=THword::no_hyf)
-translate.get_xhyf(hw.dots[1],s);
+if(hw.type[1]!=THword::none)
+translate.get_xhyf(hw.type[1],s);
 
 for(Tindex dpos= 2;dpos<=hw.size()-1;dpos++){
 translate.get_xext(hw[dpos],s);
-if(hw.dots[dpos]!=THword::no_hyf)
-translate.get_xhyf(hw.dots[dpos],s);
-if(hw.dotw[dpos]!=global_word_wt)
-translate.get_xdig(hw.dotw[dpos],s);
+if(hw.type[dpos]!=THword::none)
+translate.get_xhyf(hw.type[dpos],s);
+if(hw.weight[dpos]!=global_word_wt)
+translate.get_xdig(hw.weight[dpos],s);
 }
 file<<s<<endl;
 }
