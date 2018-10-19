@@ -15,7 +15,6 @@ template <class Tindex, class Tin_alph, class Tval_type, class Twt_type,
           class TWord_input_file>
 class pass {
 
-protected:
     TTranslate& translate;
     const Tval_type hyph_level;
     const Tval_type hopeless_hyph_val;
@@ -23,17 +22,26 @@ protected:
     const Tindex right_hyphen_min;
     const Tindex pat_len;
     const Tindex pat_dot;
-    const Tcount_type good_wt, bad_wt, thresh;
+    const Tcount_type good_wt;
+    const Tcount_type bad_wt;
+    const Tcount_type thresh;
     TCompetitive_multi_out_pat_manip& patterns;
 
-    Tcount_type good_count, bad_count, miss_count;
+    Tcount_type good_count;
+    Tcount_type bad_count;
+    Tcount_type miss_count;
     TCandidate_count_structure candidates;
 
     TWord_input_file word_input;
 
-    Tindex hyf_min, hyf_max, hyf_len;
-    Tindex dot_min, dot_max, dot_len;
-    hyphenation_type good_dot, bad_dot;
+    Tindex hyf_min;
+    Tindex hyf_max;
+    Tindex hyf_len;
+    Tindex dot_min;
+    Tindex dot_max;
+    Tindex dot_len;
+    hyphenation_type good_dot;
+    hyphenation_type bad_dot;
 
 public:
     pass(TTranslate& tra, const char* i_d_f_n,
@@ -41,7 +49,7 @@ public:
          const Tindex& lhm, const Tindex& rhm,
          const Tindex& p_l, const Tindex& p_d,
          const Twt_type& g_w, const Twt_type& b_w, const Twt_type& t,
-         TCompetitive_multi_out_pat_manip& pat):
+         TCompetitive_multi_out_pat_manip& pat) :
         translate(tra),
         hyph_level(l), hopeless_hyph_val(h),
         left_hyphen_min(lhm), right_hyphen_min(rhm),
@@ -56,11 +64,17 @@ public:
         hyf_len = hyf_min + hyf_max;
         dot_min = pat_dot;
         dot_max = pat_len - pat_dot;
-        if (dot_min < hyf_min)
+
+        if (dot_min < hyf_min) {
             dot_min = hyf_min;
-        if (dot_max < hyf_max)
+        }
+
+        if (dot_max < hyf_max) {
             dot_max = hyf_max;
+        }
+
         dot_len = dot_min + dot_max;
+
         if (hyph_level % 2 == 1) {
             good_dot = hyphenation_type::correct;
             bad_dot = hyphenation_type::none;
@@ -70,7 +84,6 @@ public:
         }
     }
 
-public:
     void hyphenate(THword& w) {
         TOutputs_of_a_pattern o;
         typename TOutputs_of_a_pattern::iterator i;
@@ -104,7 +117,6 @@ public:
         }
     }
 
-public:
     void change_dots(THword& w) {
         for (Tindex i = w.size() - hyf_max; i >= hyf_min; --i) {
             if (w.level[i] % 2 == 1) {
@@ -123,7 +135,69 @@ public:
         }
     }
 
-protected:
+    void print_pass_statistics() {
+        std::cout << std::endl;
+        std::cout << good_count << " good " << bad_count << " bad " << miss_count << " missed" << std::endl;
+        if (good_count + miss_count > 0) {
+            std::cout << 100.0 * good_count / float(good_count + miss_count) << " % ";
+            std::cout << 100.0 * bad_count / float(good_count + miss_count) << " % ";
+            std::cout << 100.0 * miss_count / float(good_count + miss_count) << " % " << std::endl;
+        }
+    }
+    
+    bool do_all(Tcount_type& level_pattern_count) {
+        std::cout << std::endl << "Generating a pass with pat_len = " << pat_len
+                << ", pat_dot = " << pat_dot << std::endl;
+
+        do_dictionary();
+        return collect_candidates(level_pattern_count);
+    }
+
+private:
+    void do_dictionary() {
+        THword w;
+        while (word_input.get(w)) {
+            if (w.size() >= hyf_len) {
+                hyphenate(w);
+                change_dots(w);
+            }
+            if (w.size() >= dot_len)
+                do_word(w);
+        }
+
+#ifdef DEBUG
+        TOutputs_of_a_pattern o;
+        vector<Tin_alph> word;
+        patterns.init_walk_through();
+        std::cout << "Patterns in the pattern manipulator:" << std::endl;
+        while (patterns.get_next_pattern(word, o)) {
+            std::cout << "Word ";
+            for (vector<Tin_alph>::iterator i = word.begin(); i != word.end();
+                 i++)
+                std::cout << *i << " ";
+            std::cout << "... has ";
+            for (typename TOutputs_of_a_pattern::const_iterator i = o.begin();
+                 i != o.end(); ++i)
+                std::cout << "(" << i->first << "," << i->second << ") ";
+            std::cout << std::endl;
+        }
+        vector<Tin_alph> vect;
+        Tcount_type a;
+        Tcount_type b;
+        candidates.init_walk_through();
+        std::cout << "Candidates:" << std::endl;
+        while (candidates.get_next_pattern(vect, a, b)) {
+            for (vector<Tin_alph>::iterator i = vect.begin(); i != vect.end(); i++)
+                std::cout << *i << " ";
+            std::cout << "with g,b: " << a << "," << b << std::endl;
+        }
+#endif
+
+        print_pass_statistics();
+        std::cout << "Count data structure statistics:" << std::endl;
+        candidates.print_statistics();
+    }
+
     void do_word(THword& w) {
         for (Tindex dpos = w.size() - dot_max; dpos >= dot_min; --dpos) {
 
@@ -148,63 +222,6 @@ protected:
         }
     }
 
-public:
-    void print_pass_statistics() {
-        std::cout << std::endl;
-        std::cout << good_count << " good " << bad_count << " bad " << miss_count << " missed" << std::endl;
-        if (good_count + miss_count > 0) {
-            std::cout << 100.0 * good_count / float(good_count + miss_count) << " % ";
-            std::cout << 100.0 * bad_count / float(good_count + miss_count) << " % ";
-            std::cout << 100.0 * miss_count / float(good_count + miss_count) << " % " << std::endl;
-        }
-    }
-
-protected:
-    void do_dictionary() {
-        THword w;
-        while (word_input.get(w)) {
-            if (w.size() >= hyf_len) {
-                hyphenate(w);
-                change_dots(w);
-            }
-            if (w.size() >= dot_len)
-                do_word(w);
-        }
-
-#ifdef DEBUG
-
-TOutputs_of_a_pattern o;
-vector<Tin_alph> word;
-patterns.init_walk_through();
-std::cout<<"Patterns in the pattern manipulator:"<<std::endl;
-while(patterns.get_next_pattern(word,o)){
-std::cout<<"Word ";
-for(vector<Tin_alph> ::iterator i= word.begin();i!=word.end();
-i++)std::cout<<*i<<" ";
-std::cout<<"... has ";
-for(typename TOutputs_of_a_pattern::const_iterator i= o.begin();
-i!=o.end();i++)
-std::cout<<"("<<i->first<<","<<i->second<<") ";
-std::cout<<std::endl;
-}
-vector<Tin_alph> vect;
-Tcount_type a;Tcount_type b;
-candidates.init_walk_through();
-std::cout<<"Candidates:"<<std::endl;
-while(candidates.get_next_pattern(vect,a,b)){
-for(vector<Tin_alph> ::iterator i= vect.begin();i!=vect.end();i++)
-std::cout<<*i<<" ";
-std::cout<<"with g,b: "<<a<<","<<b<<std::endl;
-}
-
-#endif
-
-        print_pass_statistics();
-        std::cout << "Count data structure statistics:" << std::endl;
-        candidates.print_statistics();
-    }
-
-protected:
     bool collect_candidates(Tcount_type& level_pattern_count) {
         std::cout << "Collecting candidates" << std::endl;
 
@@ -248,15 +265,6 @@ protected:
 
         level_pattern_count += good_pat_count;
         return more_to_come;
-    }
-
-public:
-    bool do_all(Tcount_type& level_pattern_count) {
-        std::cout << std::endl << "Generating a pass with pat_len = " << pat_len
-                << ", pat_dot = " << pat_dot << std::endl;
-
-        do_dictionary();
-        return collect_candidates(level_pattern_count);
     }
 
 };
