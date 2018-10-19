@@ -13,16 +13,19 @@ template <class Tindex, class Tin_alph, class Tval_type, class Twt_type,
           class TWord_input_file, class TPass>
 class level {
 
-protected:
     TTranslate& translate;
     const char* word_input_file_name;
     const Tval_type hyph_level;
     const Tval_type hopeless_hyph_val;
-    const Tindex left_hyphen_min, right_hyphen_min;
+    const Tindex left_hyphen_min;
+    const Tindex right_hyphen_min;
     TCompetitive_multi_out_pat_manip& patterns;
     Tcount_type level_pattern_count;
-    Tindex pat_start, pat_finish;
-    Tcount_type good_wt, bad_wt, thresh;
+    Tindex pat_start;
+    Tindex pat_finish;
+    Tcount_type good_wt;
+    Tcount_type bad_wt;
+    Tcount_type thresh;
 
 public:
     level(TTranslate& tra, const char* i_d_f_n,
@@ -55,7 +58,6 @@ public:
         } while (good_wt < 1);
     }
 
-public:
     void do_all() {
         std::cout << std::endl << std::endl << "Generating level " << hyph_level << std::endl;
         growing_array<char> more_this_level(true);
@@ -82,12 +84,10 @@ public:
 
         Tindex old_p_c = patterns.get_pat_count();
         patterns.delete_values(hopeless_hyph_val);
-        std::cout << old_p_c - patterns.get_pat_count()
-                << " bad patterns deleted" << std::endl;
+        std::cout << old_p_c - patterns.get_pat_count() << " bad patterns deleted" << std::endl;
         patterns.delete_hanging();
 
-        std::cout << "total of " << level_pattern_count << " patterns at level "
-                << hyph_level << std::endl;
+        std::cout << "total of " << level_pattern_count << " patterns at level " << hyph_level << std::endl;
     }
 
 };
