@@ -1,8 +1,4 @@
-/*79:*/
-#line 2003 "patlib.w"
-
-#ifndef PTL_GEN_H
-#define PTL_GEN_H
+#pragma once
 
 #include <iostream>
 #include <cstdio>
@@ -11,9 +7,6 @@
 #include "exception.hpp"
 #include "ptl_mopm.hpp"
 #include "hyphenated_word.hpp"
-
-/*80:*/
-#line 2025 "patlib.w"
 
 namespace ptl {
 
@@ -24,8 +17,6 @@ template <class Tindex, class Tin_alph, class Tval_type, class Twt_type,
           class TOutputs_of_a_pattern,
           class TWord_input_file>
 class Pass {
-    /*81:*/
-#line 2048 "patlib.w"
 
 protected:
     TTranslate& translate;
@@ -46,12 +37,6 @@ protected:
     Tindex hyf_min, hyf_max, hyf_len;
     Tindex dot_min, dot_max, dot_len;
     hyphenation_type good_dot, bad_dot;
-
-    /*:81*/
-#line 2034 "patlib.w"
-
-    /*82:*/
-#line 2084 "patlib.w"
 
 public:
     Pass(TTranslate& tra, const char* i_d_f_n,
@@ -88,12 +73,6 @@ public:
         }
     }
 
-    /*:82*/
-#line 2035 "patlib.w"
-
-    /*83:*/
-#line 2132 "patlib.w"
-
 public:
     void hyphenate(THword& w) {
         TOutputs_of_a_pattern o;
@@ -110,7 +89,7 @@ public:
             if (i->second >= hyph_level &&
                 i->first >= dot_min && i->first <= w.size() - dot_max) {
 
-                vector<Tin_alph> subw;
+                std::vector<Tin_alph> subw;
                 for (Tindex j = i->first + 1 - pat_dot;
                      j <= i->first + pat_len - pat_dot; ++j) {
                     subw.push_back(w[j]);
@@ -127,12 +106,6 @@ public:
             }
         }
     }
-
-    /*:83*/
-#line 2037 "patlib.w"
-
-    /*84:*/
-#line 2180 "patlib.w"
 
 public:
     void change_dots(THword& w) {
@@ -153,31 +126,20 @@ public:
         }
     }
 
-    /*:84*/
-#line 2038 "patlib.w"
-
-    /*85:*/
-#line 2212 "patlib.w"
-
 protected:
     void do_word(THword& w) {
         for (Tindex dpos = w.size() - dot_max; dpos >= dot_min; --dpos) {
-            /*86:*/
-#line 2238 "patlib.w"
 
             if (w.is_knocked_out[dpos])
                 continue;
             if ((w.type[dpos] != good_dot) && (w.type[dpos] != bad_dot))
                 continue;
 
-            /*:86*/
-#line 2217 "patlib.w"
-
             Tindex spos = dpos - pat_dot;
             Tindex fpos = spos + pat_len;
             ++spos;
 
-            vector<Tin_alph> subw;
+            std::vector<Tin_alph> subw;
             for (Tindex i = spos; i <= fpos; ++i)
                 subw.push_back(w[i]);
 
@@ -189,31 +151,19 @@ protected:
         }
     }
 
-    /*:85*/
-#line 2039 "patlib.w"
-
-    /*87:*/
-#line 2244 "patlib.w"
-
 public:
-    void print_pass_statistics(void) {
-        cout << endl;
-        cout << good_count << " good " << bad_count << " bad " << miss_count << " missed" << endl;
+    void print_pass_statistics() {
+        std::cout << std::endl;
+        std::cout << good_count << " good " << bad_count << " bad " << miss_count << " missed" << std::endl;
         if (good_count + miss_count > 0) {
-            cout << 100.0 * good_count / float(good_count + miss_count) << " % ";
-            cout << 100.0 * bad_count / float(good_count + miss_count) << " % ";
-            cout << 100.0 * miss_count / float(good_count + miss_count) << " % " << endl;
+            std::cout << 100.0 * good_count / float(good_count + miss_count) << " % ";
+            std::cout << 100.0 * bad_count / float(good_count + miss_count) << " % ";
+            std::cout << 100.0 * miss_count / float(good_count + miss_count) << " % " << std::endl;
         }
     }
 
-    /*:87*/
-#line 2040 "patlib.w"
-
-    /*88:*/
-#line 2260 "patlib.w"
-
 protected:
-    void do_dictionary(void) {
+    void do_dictionary() {
         THword w;
         while (word_input.get(w)) {
             if (w.size() >= hyf_len) {
@@ -229,46 +179,40 @@ protected:
 TOutputs_of_a_pattern o;
 vector<Tin_alph> word;
 patterns.init_walk_through();
-cout<<"Patterns in the pattern manipulator:"<<endl;
+std::cout<<"Patterns in the pattern manipulator:"<<std::endl;
 while(patterns.get_next_pattern(word,o)){
-cout<<"Word ";
+std::cout<<"Word ";
 for(vector<Tin_alph> ::iterator i= word.begin();i!=word.end();
-i++)cout<<*i<<" ";
-cout<<"... has ";
+i++)std::cout<<*i<<" ";
+std::cout<<"... has ";
 for(typename TOutputs_of_a_pattern::const_iterator i= o.begin();
 i!=o.end();i++)
-cout<<"("<<i->first<<","<<i->second<<") ";
-cout<<endl;
+std::cout<<"("<<i->first<<","<<i->second<<") ";
+std::cout<<std::endl;
 }
 vector<Tin_alph> vect;
 Tcount_type a;Tcount_type b;
 candidates.init_walk_through();
-cout<<"Candidates:"<<endl;
+std::cout<<"Candidates:"<<std::endl;
 while(candidates.get_next_pattern(vect,a,b)){
 for(vector<Tin_alph> ::iterator i= vect.begin();i!=vect.end();i++)
-cout<<*i<<" ";
-cout<<"with g,b: "<<a<<","<<b<<endl;
+std::cout<<*i<<" ";
+std::cout<<"with g,b: "<<a<<","<<b<<std::endl;
 }
 
 #endif
 
         print_pass_statistics();
-        cout << "Count data structure statistics:" << endl;
+        std::cout << "Count data structure statistics:" << std::endl;
         candidates.print_statistics();
     }
 
-    /*:88*/
-#line 2041 "patlib.w"
-
-    /*89:*/
-#line 2322 "patlib.w"
-
 protected:
     bool collect_candidates(Tcount_type& level_pattern_count) {
-        cout << "Collecting candidates" << endl;
+        std::cout << "Collecting candidates" << std::endl;
 
         bool more_to_come = false;
-        vector<Tin_alph> w;
+        std::vector<Tin_alph> w;
         Tcount_type g, b;
         Tcount_type good_pat_count = 0;
         Tcount_type bad_pat_count = 0;
@@ -291,49 +235,34 @@ protected:
             }
         }
 
-        cout << good_pat_count << " good and " << bad_pat_count << " bad patterns added";
+        std::cout << good_pat_count << " good and " << bad_pat_count << " bad patterns added";
         if (more_to_come == true)
-            cout << " (more to come)";
-        cout << endl;
-        cout << "finding " << good_count << " good and " << bad_count << " bad hyphens" << endl;
+            std::cout << " (more to come)";
+        std::cout << std::endl;
+        std::cout << "finding " << good_count << " good and " << bad_count << " bad hyphens" << std::endl;
         if (good_pat_count > 0) {
-            cout << "efficiency = "
+            std::cout << "efficiency = "
                     << float(good_count) / (float(good_pat_count) + float(bad_count) /
                                             (float(thresh) / float(good_wt)))
-                    << endl;
+                    << std::endl;
         }
-        cout << "Pattern data structure statistics:" << endl;
+        std::cout << "Pattern data structure statistics:" << std::endl;
         patterns.print_statistics();
 
         level_pattern_count += good_pat_count;
         return more_to_come;
     }
 
-    /*:89*/
-#line 2042 "patlib.w"
-
-    /*90:*/
-#line 2374 "patlib.w"
-
 public:
     bool do_all(Tcount_type& level_pattern_count) {
-        cout << endl << "Generating a pass with pat_len = " << pat_len
-                << ", pat_dot = " << pat_dot << endl;
+        std::cout << std::endl << "Generating a pass with pat_len = " << pat_len
+                << ", pat_dot = " << pat_dot << std::endl;
 
         do_dictionary();
         return collect_candidates(level_pattern_count);
     }
 
-    /*:90*/
-#line 2043 "patlib.w"
-
 };
-
-/*:80*/
-#line 2014 "patlib.w"
-
-/*91:*/
-#line 2389 "patlib.w"
 
 template <class Tindex, class Tin_alph, class Tval_type, class Twt_type,
           class Tcount_type, class THword, class TTranslate,
@@ -341,8 +270,6 @@ template <class Tindex, class Tin_alph, class Tval_type, class Twt_type,
           class TCompetitive_multi_out_pat_manip,
           class TWord_input_file, class TPass>
 class Level {
-    /*92:*/
-#line 2417 "patlib.w"
 
 protected:
     TTranslate& translate;
@@ -355,12 +282,6 @@ protected:
     Tindex pat_start, pat_finish;
     Tcount_type good_wt, bad_wt, thresh;
 
-    /*:92*/
-#line 2397 "patlib.w"
-
-    /*93:*/
-#line 2432 "patlib.w"
-
 public:
     Level(TTranslate& tra, const char* i_d_f_n,
           const Tval_type& l, const Tval_type& h,
@@ -372,35 +293,29 @@ public:
         patterns(p),
         level_pattern_count(0) {
         do {
-            cout << "pat_start, pat_finish: ";
-            cin >> pat_start;
-            cin >> pat_finish;
+            std::cout << "pat_start, pat_finish: ";
+            std::cin >> pat_start;
+            std::cin >> pat_finish;
             if (pat_start < 1 || pat_start > pat_finish) {
-                cout << "Specify two integers satisfying 1<=pat_start<=pat_finish ";
+                std::cout << "Specify two integers satisfying 1<=pat_start<=pat_finish ";
                 pat_start = 0;
             }
         } while (pat_start < 1);
         do {
-            cout << "good weight, bad weight, threshold: ";
-            cin >> good_wt;
-            cin >> bad_wt;
-            cin >> thresh;
+            std::cout << "good weight, bad weight, threshold: ";
+            std::cin >> good_wt;
+            std::cin >> bad_wt;
+            std::cin >> thresh;
             if (good_wt < 1 || bad_wt < 1 || thresh < 1) {
-                cout << "Specify three integers: good weight, bad weight, threshold>=1 ";
+                std::cout << "Specify three integers: good weight, bad weight, threshold>=1 ";
                 good_wt = 0;
             }
         } while (good_wt < 1);
     }
 
-    /*:93*/
-#line 2398 "patlib.w"
-
-    /*94:*/
-#line 2474 "patlib.w"
-
 public:
-    void do_all(void) {
-        cout << endl << endl << "Generating level " << hyph_level << endl;
+    void do_all() {
+        std::cout << std::endl << std::endl << "Generating level " << hyph_level << std::endl;
         growing_array<char> more_this_level(true);
         for (Tindex pat_len = pat_start; pat_len <= pat_finish; ++pat_len) {
 
@@ -425,24 +340,15 @@ public:
 
         Tindex old_p_c = patterns.get_pat_count();
         patterns.delete_values(hopeless_hyph_val);
-        cout << old_p_c - patterns.get_pat_count()
-                << " bad patterns deleted" << endl;
+        std::cout << old_p_c - patterns.get_pat_count()
+                << " bad patterns deleted" << std::endl;
         patterns.delete_hanging();
 
-        cout << "total of " << level_pattern_count << " patterns at level "
-                << hyph_level << endl;
+        std::cout << "total of " << level_pattern_count << " patterns at level "
+                << hyph_level << std::endl;
     }
 
-    /*:94*/
-#line 2399 "patlib.w"
-
 };
-
-/*:91*/
-#line 2015 "patlib.w"
-
-/*95:*/
-#line 2514 "patlib.w"
 
 template <class Tindex, class Tin_alph, class Tval_type, class Twt_type,
           class Tcount_type, class THword, class TTranslate,
@@ -453,8 +359,6 @@ template <class Tindex, class Tin_alph, class Tval_type, class Twt_type,
           class TPattern_input_file, class TPattern_output_file,
           class TPass, class TLevel>
 class Generator {
-    /*96:*/
-#line 2537 "patlib.w"
 
 protected:
     TTranslate translate;
@@ -466,12 +370,6 @@ protected:
     Tval_type hyph_start, hyph_finish;
     Tindex left_hyphen_min, right_hyphen_min;
 
-    /*:96*/
-#line 2525 "patlib.w"
-
-    /*97:*/
-#line 2551 "patlib.w"
-
 public:
     Generator(const char* dic, const char* pat,
               const char* out, const char* tra):
@@ -482,25 +380,19 @@ public:
         left_hyphen_min(translate.get_left_hyphen_min()),
         right_hyphen_min(translate.get_right_hyphen_min()) {
         do {
-            cout << "hyph_start, hyph_finish: ";
-            cin >> hyph_start;
-            cin >> hyph_finish;
+            std::cout << "hyph_start, hyph_finish: ";
+            std::cin >> hyph_start;
+            std::cin >> hyph_finish;
             if ((hyph_start < 1) || (hyph_finish < 1)) {
                 hyph_start = 0;
-                cout << "Specify two integers satisfying 1<=hyph_start, hyph_finish "
-                        << endl;
+                std::cout << "Specify two integers satisfying 1<=hyph_start, hyph_finish "
+                        << std::endl;
             }
         } while (hyph_start < 1);
     }
 
-    /*:97*/
-#line 2526 "patlib.w"
-
-    /*98:*/
-#line 2575 "patlib.w"
-
-    void read_patterns(void) {
-        vector<Tin_alph> v;
+    void read_patterns() {
+        std::vector<Tin_alph> v;
         TOutputs_of_a_pattern o;
 
         TPattern_input_file file(translate, pattern_input_file_name);
@@ -519,16 +411,10 @@ public:
         }
     }
 
-    /*:98*/
-#line 2527 "patlib.w"
-
-    /*99:*/
-#line 2599 "patlib.w"
-
-    void output_patterns(void) {
+    void output_patterns() {
         TPattern_output_file file(translate, pattern_output_file_name);
 
-        vector<Tin_alph> v;
+        std::vector<Tin_alph> v;
         TOutputs_of_a_pattern o;
         patterns.init_walk_through();
         while (patterns.get_next_pattern(v, o)) {
@@ -536,17 +422,11 @@ public:
         }
     }
 
-    /*:99*/
-#line 2528 "patlib.w"
-
-    /*100:*/
-#line 2631 "patlib.w"
-
 public:
-    void hyphenate_word_list(void) {
-        string s;
-        cout << "hyphenate word list <y/n>? ";
-        cin >> s;
+    void hyphenate_word_list() {
+        std::string s;
+        std::cout << "hyphenate word list <y/n>? ";
+        std::cin >> s;
         if (!(s == "y" || s == "Y"))
             return;
 
@@ -557,7 +437,7 @@ public:
 
         char file_name[100];
         sprintf(file_name, "pattmp.%d", level_value);
-        cout << "Writing file " << file_name << endl;
+        std::cout << "Writing file " << file_name << std::endl;
 
         THword w;
         TWord_output_file o_f(translate, file_name);
@@ -576,16 +456,10 @@ public:
         pass.print_pass_statistics();
     }
 
-    /*:100*/
-#line 2529 "patlib.w"
-
-    /*101:*/
-#line 2668 "patlib.w"
-
 public:
-    void do_all(void) {
+    void do_all() {
         read_patterns();
-        cout << patterns.get_pat_count() << " pattern lines read in" << endl;
+        std::cout << patterns.get_pat_count() << " pattern lines read in" << std::endl;
 
         Tval_type hopeless_fake_number = 2 * ((hyph_finish / 2) + 1);
 
@@ -597,17 +471,9 @@ public:
         }
         output_patterns();
         hyphenate_word_list();
-        cout << endl;
-    } /*:101*/
-#line 2530 "patlib.w"
+        std::cout << std::endl;
+    }
 
 };
-
-/*:95*/
-#line 2016 "patlib.w"
-
-#endif
-
-/*:79*/
 
 } // namespace ptl
