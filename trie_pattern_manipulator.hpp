@@ -10,7 +10,7 @@
 namespace ptl {
 
     template <class Tpm_pointer, class Tin_alph, class Tout_information>
-    class Trie_pattern_manipulator {
+    class trie_pattern_manipulator {
 
         enum {
             min_in_alph= 0
@@ -46,7 +46,7 @@ namespace ptl {
         std::vector<Tpm_pointer> char_stack;
 
     public:
-        Trie_pattern_manipulator(const Tin_alph& max_i_a,
+        trie_pattern_manipulator(const Tin_alph& max_i_a,
                                  const Tout_information& out_i_z,
                                  const unsigned& q_thr = 5):
 
@@ -74,7 +74,7 @@ namespace ptl {
             trieq_outp = new Tout_information[max_in_alph + 1];
         }
 
-        ~Trie_pattern_manipulator() {
+        virtual ~trie_pattern_manipulator() {
             delete[]trieq_char;
             delete[]trieq_link;
             delete[]trieq_back;
