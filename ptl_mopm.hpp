@@ -1,8 +1,4 @@
-/*41:*/
-#line 1066 "patlib.w"
-
-#ifndef PTL_MOPM_H
-#define PTL_MOPM_H
+#pragma once
 
 #include <iostream>
 #include <map>
