@@ -1,6 +1,9 @@
 #pragma once
 
-/// Default Patlib namespace.
+
+/**
+ * \brief Default Patlib namespace.
+ */
 namespace ptl {
 
 const char* patlib_version = "1.0";
