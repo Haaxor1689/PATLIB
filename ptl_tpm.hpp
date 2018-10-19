@@ -6,13 +6,16 @@
 
 #include <iostream> 
 #include <vector> 
-#include <set> 
-#include "ptl_exc.h"
-#include "ptl_ga.h"
+#include <set>
+
+#include "exception.hpp"
+#include "growing_array.hpp"
 
 /*16:*/
 #line 317 "patlib.w"
 
+namespace ptl {
+    
 template<class Tpm_pointer,class Tin_alph,class Tout_information> 
 class Trie_pattern_manipulator
 {
@@ -36,13 +39,13 @@ Tpm_pointer pat_count;
 const Tin_alph max_in_alph;
 const Tout_information out_inf_zero;
 
-Growing_array<Tpm_pointer,Tin_alph> trie_char;
-Growing_array<Tpm_pointer,Tpm_pointer> trie_link;
-Growing_array<Tpm_pointer,Tpm_pointer> trie_back;
-Growing_array<Tpm_pointer,char> trie_base_used;
+growing_array<Tpm_pointer,Tin_alph> trie_char;
+growing_array<Tpm_pointer,Tpm_pointer> trie_link;
+growing_array<Tpm_pointer,Tpm_pointer> trie_back;
+growing_array<Tpm_pointer,char> trie_base_used;
 
 
-Growing_array<Tpm_pointer,Tout_information> trie_outp;
+growing_array<Tpm_pointer,Tout_information> trie_outp;
 
 unsigned q_max;
 unsigned q_max_thresh;
@@ -676,3 +679,4 @@ return ret_val;
 #endif
 
 /*:15*/
+} // namespace ptl

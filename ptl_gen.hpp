@@ -6,13 +6,16 @@
 
 #include <iostream> 
 #include <cstdio> 
-#include <iomanip> 
-#include "ptl_exc.h"
-#include "ptl_mopm.h"
-#include "ptl_hwrd.h"
+#include <iomanip>
+
+#include "exception.hpp"
+#include "ptl_mopm.hpp"
+#include "hyphenated_word.hpp"
 
 /*80:*/
 #line 2025 "patlib.w"
+
+namespace ptl {
 
 template<class Tindex,class Tin_alph,class Tval_type,class Twt_type,
 class Tcount_type,class THword,class TTranslate,
@@ -45,7 +48,7 @@ TWord_input_file word_input;
 
 Tindex hyf_min,hyf_max,hyf_len;
 Tindex dot_min,dot_max,dot_len;
-typename THword::hyphenation_type good_dot,bad_dot;
+typename hyphenation_type good_dot,bad_dot;
 
 
 /*:81*/
@@ -80,11 +83,11 @@ if(dot_min<hyf_min)dot_min= hyf_min;
 if(dot_max<hyf_max)dot_max= hyf_max;
 dot_len= dot_min+dot_max;
 if(hyph_level%2==1){
-good_dot= THword::correct;
-bad_dot= THword::none;
+good_dot= hyphenation_type::correct;
+bad_dot= hyphenation_type::none;
 }else{
-good_dot= THword::wrong;
-bad_dot= THword::past;
+good_dot= hyphenation_type::wrong;
+bad_dot= hyphenation_type::past;
 }
 }
 
@@ -142,17 +145,17 @@ void change_dots(THword&w)
 {
 for(Tindex i= w.size()-hyf_max;i>=hyf_min;i--){
 if(w.level[i]%2==1){
-if(w.type[i]==THword::none)
-w.type[i]= THword::wrong;
-else if(w.type[i]==THword::correct)
-w.type[i]= THword::past;
+if(w.type[i]==hyphenation_type::none)
+w.type[i]= hyphenation_type::wrong;
+else if(w.type[i]==hyphenation_type::correct)
+w.type[i]= hyphenation_type::past;
 }
 
-if(w.type[i]==THword::past)
+if(w.type[i]==hyphenation_type::past)
 good_count+= w.weight[i];
-else if(w.type[i]==THword::wrong)
+else if(w.type[i]==hyphenation_type::wrong)
 bad_count+= w.weight[i];
-else if(w.type[i]==THword::correct)
+else if(w.type[i]==hyphenation_type::correct)
 miss_count+= w.weight[i];
 }
 }
@@ -410,7 +413,7 @@ public:
 void do_all(void)
 {
 cout<<endl<<endl<<"Generating level "<<hyph_level<<endl;
-Growing_array<Tindex,char> more_this_level(true);
+growing_array<Tindex,char> more_this_level(true);
 for(Tindex pat_len= pat_start;pat_len<=pat_finish;pat_len++){
 
 Tindex pat_dot= pat_len/2;
@@ -520,7 +523,7 @@ if(v.size()> 0){
 for(typename TOutputs_of_a_pattern::iterator i= o.begin();
 i!=o.end();i++){
 if(i->second>=hyph_start){
-throw Patlib_error("! The patterns to be read in contain "
+throw exception("! The patterns to be read in contain "
 "hyphenation value bigger than hyph_start.");
 }
 patterns.insert_pattern(v,i->first,i->second);
@@ -620,3 +623,5 @@ cout<<endl;
 #endif
 
 /*:79*/
+
+} // namespace ptl

@@ -13,10 +13,13 @@ const char*opatgen_cvs_id= "$Id: opatgen.w,v 1.24 2001/12/03 17:51:13 antos Exp 
 #include <map> 
 #include <string> 
 #include <fstream> 
-#include "ptl_exc.h"
-#include "ptl_gen.h"
-#include "ptl_vers.h"
+
+#include "exception.hpp"
+#include "ptl_gen.hpp"
+#include "version.hpp"
+
 using namespace std;
+using namespace ptl;
 
 bool utf_8;
 
@@ -322,7 +325,7 @@ for(Tindex i= THword::wrong;i<=THword::past;i++){
 if(s.length()-1>=i+3){
 classify(s[i+3],cs);
 if(utf_8&&s[i+3]> 0x80){
-throw Patlib_error("! Error reading translate file, In the first line, "
+throw exception("! Error reading translate file, In the first line, "
 "specifying hyf characters:\n"
 "In UTF-8 mode 8-bit symbol is not allowed.");
 }
@@ -331,11 +334,11 @@ if(cs.first==invalid_class){
 
 vector<Tfile_unit> v;
 v.push_back(s[i+3]);
-xhyf.insert((typename THword::hyphenation_type)i,v);
+xhyf.insert(static_cast<hyphenation_type>(i),v);
 classified_symbols.hard_insert_pattern(s[i+3],
 make_pair(hyf_class,i));
 }else{
-throw Patlib_error("! Error reading translate file. In the first line, "
+throw ptl::exception("! Error reading translate file. In the first line, "
 "specifying hyf characters:\n"
 "Specified symbol has been already assigned.");
 }
@@ -393,7 +396,7 @@ make_pair(letter_class,internal));
 else{
 cerr<<"! Error: Translate file, line "<<lineno<<":"<<endl;
 cerr<<"Trying to redefine previously defined character"<<endl;
-throw Patlib_error("");
+throw exception("");
 }
 }
 else{
@@ -407,13 +410,13 @@ cerr<<"! Error: Translate file, line "<<lineno<<":"<<endl;
 cerr<<"The first symbol of multi-char or UTF-8 sequence has been ";
 cerr<<"used before";
 cerr<<endl<<"as non-escape character"<<endl;
-throw Patlib_error("");
+throw exception("");
 }
 classify(letter_repres,cs);
 if(cs.first!=invalid_class){
 cerr<<"! Error: Translate file, line "<<lineno<<":"<<endl;
 cerr<<"Trying to redefine previously defined character"<<endl;
-throw Patlib_error("");
+throw exception("");
 }
 /*21:*/
 #line 609 "opatgen.w"
@@ -647,7 +650,7 @@ hw.weight[hw.size()]= global_word_wt;
 else{
 cerr<<"! Error in "<<file_name<<" line "<<lineno<<": "
 <<"Multibyte sequence is invalid"<<endl;
-throw Patlib_error("");
+throw exception("");
 }
 }
 
@@ -764,7 +767,7 @@ else{
 cerr<<"! Error in "<<file_name<<" line "<<lineno<<": "
 <<"Escape sequence is invalid"<<endl;
 cerr<<"(Are you using correct encoding--the -u8 switch?)"<<endl;
-throw Patlib_error("");
+throw exception("");
 }
 
 /*:38*/
@@ -774,7 +777,7 @@ break;
 default:
 cerr<<"! Error in "<<file_name<<" line "<<lineno<<": "
 <<"Invalid character in input data"<<endl;
-throw Patlib_error("");
+throw exception("");
 break;
 }
 }
@@ -895,7 +898,7 @@ chars_read++;
 else{
 cerr<<"! Error in "<<file_name<<" line "<<lineno<<": "
 <<"Multibyte sequence is invalid"<<endl;
-throw Patlib_error("");
+throw exception("");
 }
 }
 
@@ -979,7 +982,7 @@ else{
 cerr<<"! Error in "<<file_name<<" line "<<lineno<<": "
 <<"Escape sequence is invalid"<<endl;
 cerr<<"(Are you using correct encoding--the -u8 switch?)"<<endl;
-throw Patlib_error("");
+throw exception("");
 }
 
 /*:48*/
@@ -989,7 +992,7 @@ break;
 default:
 cerr<<"! Error in "<<file_name<<" line "<<lineno<<": "
 <<"Invalid character in pattern data"<<endl;
-throw Patlib_error("");
+throw exception("");
 }
 }
 }while(i!=s.end());
@@ -1184,7 +1187,7 @@ typedef unsigned Tcount_type;
 typedef unsigned Tnum_type;
 
 
-typedef Hword<Tindex,Tin_alph,Twt_type,Tval_type> THword;
+typedef hyphenated_word<Tin_alph,Twt_type,Tval_type> THword;
 
 typedef Translate<Tindex,Tin_alph,THword> TTranslate;
 
@@ -1291,7 +1294,7 @@ cout<<"opatgen: needs some arguments"<<endl
 return 1;
 }
 }
-catch(Patlib_error e){
+catch(const ptl::exception& e){
 e.what();
 cerr<<endl<<"This was fatal error, sorry. Giving up."<<endl;
 }

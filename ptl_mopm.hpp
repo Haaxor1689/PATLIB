@@ -7,7 +7,7 @@
 #include <iostream> 
 #include <map> 
 #include <set> 
-#include "ptl_tpm.h"
+#include "ptl_tpm.hpp"
 
 /*42:*/
 #line 1103 "patlib.w"
