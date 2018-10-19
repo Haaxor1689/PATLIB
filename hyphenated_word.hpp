@@ -2,28 +2,13 @@
 
 #include <iostream>
 #include <vector>
+
+#include "hyphenation_type.hpp"
 #include "growing_array.hpp"
 
 namespace ptl {
 
-enum class hyphenation_type {
-    none,
-    wrong,
-    correct,
-    past
-};
-
-inline std::ostream& operator<<(std::ostream& os, hyphenation_type type) {
-    switch (type) {
-    case hyphenation_type::none: return os << "hyphenation_type::none";
-    case hyphenation_type::wrong: return os << "hyphenation_type::wrong";
-    case hyphenation_type::correct: return os << "hyphenation_type::correct";
-    case hyphenation_type::past: return os << "hyphenation_type::past";
-    default: return os << "hyphenation_type::NOT_VALID_ENUM_CASE";
-    }
-}
-
-    /**
+/**
  * \brief Class for holding info about hyphenated word.
  * \todo Remove 4 redundant growing arrays.
  * \tparam Tin_alph Element type.

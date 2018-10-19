@@ -129,7 +129,7 @@ subwo.find(pat_dot);
 
 if(val_on_pat_dot!=subwo.end())
 if(val_on_pat_dot->second>=hyph_level)
-w.no_more[i->first]= true;
+w.is_knocked_out[i->first]= true;
 }
 }
 }
@@ -173,7 +173,7 @@ for(Tindex dpos= w.size()-dot_max;dpos>=dot_min;dpos--){
 /*86:*/
 #line 2238 "patlib.w"
 
-if(w.no_more[dpos])continue;
+if(w.is_knocked_out[dpos])continue;
 if((w.type[dpos]!=good_dot)&&(w.type[dpos]!=bad_dot))continue;
 
 /*:86*/
@@ -413,7 +413,7 @@ public:
 void do_all(void)
 {
 cout<<endl<<endl<<"Generating level "<<hyph_level<<endl;
-growing_array<Tindex,char> more_this_level(true);
+growing_array<char> more_this_level(true);
 for(Tindex pat_len= pat_start;pat_len<=pat_finish;pat_len++){
 
 Tindex pat_dot= pat_len/2;
