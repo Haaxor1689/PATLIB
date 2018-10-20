@@ -31,11 +31,14 @@ public:
     }
 };
 
-template <class Tindex, class Tin_alph, class Tout_alph>
 class multi_output_pattern_manipulator {
-protected:
+    
+    using Tindex = std::size_t;
+    using Tin_alph = unsigned;
+    using Tout_alph = unsigned;
+
     using output_type = Outputs_of_patterns<Tindex, Tout_alph>;
-    using output_iterator = typename output_type::iterator;
+    using output_iterator = output_type::iterator;
 
     output_type outputs;
     trie_pattern_manipulator<Tindex, Tin_alph, output_iterator> words;
@@ -143,9 +146,13 @@ public:
 
 };
 
-template <class Tindex, class Tin_alph, class Tout_alph>
-class competitive_multi_out_pat_manip : public multi_output_pattern_manipulator<Tindex, Tin_alph, Tout_alph> {
-    using base = multi_output_pattern_manipulator<Tindex, Tin_alph, Tout_alph>;
+class competitive_multi_out_pat_manip : public multi_output_pattern_manipulator {
+
+    using Tindex = std::size_t;
+    using Tin_alph = unsigned;
+    using Tout_alph = unsigned;
+
+    using base = multi_output_pattern_manipulator;
 
 public:
     competitive_multi_out_pat_manip(const Tin_alph& max_i_a) : base(max_i_a) {}
@@ -175,11 +182,11 @@ protected:
                     continue;
                 auto oi = o.find(s + (j.first));
                 if (oi == o.end())
-                    o.insert(make_pair(s + (j.first), j.second));
+                    o.insert(std::make_pair(s + (j.first), j.second));
                 else {
                     if (oi->second < j.second) {
                         o.erase(s + (j.first));
-                        o.insert(make_pair(s + (j.first), j.second));
+                        o.insert(std::make_pair(s + (j.first), j.second));
                     }
                 }
             }
