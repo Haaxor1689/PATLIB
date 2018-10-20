@@ -1,38 +1,33 @@
 #pragma once
 
+#include <fstream>
+#include <vector>
+
 namespace ptl {
     
-template <class Tindex, class Tin_alph, class Tval_type,
-          class TTranslate, class TOutputs_of_a_pattern>
-class Pattern_output_file {
+template <class Tindex, class Tin_alph, class Tval_type, class TTranslate, class TOutputs_of_a_pattern>
+class pattern_output_file {
 
-protected:
     TTranslate& translate;
-    const char* file_name;
-    ofstream file;
-
-    typedef typename TTranslate::Tfile_unit Tfile_unit;
+    const std::string file_name;
+    std::basic_ofstream<unsigned char> file;
 
 public:
-    Pattern_output_file(TTranslate& t, const char* fn):
-        translate(t), file_name(fn), file(file_name) {}
+    pattern_output_file(TTranslate& t, const char* fn) : translate(t), file_name(fn), file(file_name) {}
 
-public:
-    void put(const vector<Tin_alph>& v, const TOutputs_of_a_pattern& o) {
+    void put(const std::vector<Tin_alph>& v, const TOutputs_of_a_pattern& o) {
         typename TOutputs_of_a_pattern::const_iterator oi;
-        basic_string<Tfile_unit> s;
+        std::basic_string<unsigned char> s;
+
         Tindex pos = 0;
-
-        for (typename vector<Tin_alph>::const_iterator vi = v.begin();
-             vi != v.end(); ++vi) {
-
+        for (const auto& vi : v) {
             oi = o.find(pos);
             if (oi != o.end()) {
                 translate.get_xdig(oi->second, s);
             }
 
             ++pos;
-            translate.get_xext(*vi, s);
+            translate.get_xext(vi, s);
         }
 
         oi = o.find(pos);
@@ -40,7 +35,7 @@ public:
             translate.get_xdig(oi->second, s);
         }
 
-        file << s << endl;
+        file << s << std::endl;
     }
 
 };

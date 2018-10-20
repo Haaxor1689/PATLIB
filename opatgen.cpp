@@ -52,7 +52,7 @@ TWord_output_file;
 typedef pattern_input_file<Tindex, Tin_alph, Tval_type, TTranslate,
                            TOutputs_of_a_pattern> TPattern_input_file;
 
-typedef Pattern_output_file<Tindex, Tin_alph, Tval_type, TTranslate,
+typedef pattern_output_file<Tindex, Tin_alph, Tval_type, TTranslate,
                             TOutputs_of_a_pattern> TPattern_output_file;
 
 typedef pass<Tindex, Tin_alph, Tval_type, Twt_type,
