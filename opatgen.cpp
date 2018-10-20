@@ -20,44 +20,34 @@ const char* opatgen_cvs_id = "$Id: opatgen.w,v 1.24 2001/12/03 17:51:13 antos Ex
 
 using namespace ptl;
 
+typedef translate<std::size_t, unsigned> TTranslate;
 
-typedef unsigned long Tindex;
-typedef unsigned Tin_alph;
-typedef unsigned short Tval_type;
-typedef unsigned Twt_type;
-typedef unsigned Tcount_type;
-typedef unsigned Tnum_type;
-
-typedef hyphenated_word<Tin_alph, Twt_type, Tval_type> THword;
-
-typedef translate<Tindex, Tin_alph> TTranslate;
-
-typedef candidate_count_trie<Tindex, Tin_alph, Tcount_type, Tcount_type>
+typedef candidate_count_trie<std::size_t, unsigned, unsigned, unsigned>
 TCandidate_count_structure;
 
-typedef Competitive_multi_out_pat_manip<Tindex, Tin_alph, Tval_type>
+typedef Competitive_multi_out_pat_manip<std::size_t, unsigned, unsigned>
 TCompetitive_multi_out_pat_manip;
 
-typedef Outputs_of_a_pattern<Tindex, Tval_type> TOutputs_of_a_pattern;
+typedef Outputs_of_a_pattern<std::size_t, unsigned> TOutputs_of_a_pattern;
 
-typedef word_input_file<THword, TTranslate, Tnum_type> TWord_input_file;
+typedef word_input_file<hyphenated_word, TTranslate, unsigned> TWord_input_file;
 
-typedef word_output_file<Tindex, THword, TTranslate>
+typedef word_output_file<std::size_t, hyphenated_word, TTranslate>
 TWord_output_file;
 
-typedef pattern_input_file<Tindex, Tin_alph, Tval_type, TTranslate,
+typedef pattern_input_file<std::size_t, unsigned, unsigned, TTranslate,
                            TOutputs_of_a_pattern> TPattern_input_file;
 
-typedef pattern_output_file<Tindex, Tin_alph, Tval_type, TTranslate,
+typedef pattern_output_file<std::size_t, unsigned, unsigned, TTranslate,
                             TOutputs_of_a_pattern> TPattern_output_file;
 
-typedef pass<Tindex, Tin_alph, Tval_type, Twt_type,
-             Tcount_type, THword, TTranslate, TCandidate_count_structure,
+typedef pass<std::size_t, unsigned, unsigned, unsigned,
+             unsigned, hyphenated_word, TTranslate, TCandidate_count_structure,
              TCompetitive_multi_out_pat_manip, TOutputs_of_a_pattern,
              TWord_input_file> TPass;
 
-typedef level<Tindex, Tin_alph, Tval_type, Twt_type,
-              Tcount_type, THword, TTranslate, TCandidate_count_structure,
+typedef level<std::size_t, unsigned, unsigned, unsigned,
+              unsigned, hyphenated_word, TTranslate, TCandidate_count_structure,
               TCompetitive_multi_out_pat_manip, TWord_input_file, TPass> TLevel;
 
 void print_banner() {
@@ -99,7 +89,7 @@ int main(int argc, char* argv[]) {
     try {
         if (argc == 5) {
             utf_8 = false;
-            generator<Tindex, Tin_alph, Tval_type, Twt_type, Tcount_type, THword,
+            generator<std::size_t, unsigned, unsigned, unsigned, unsigned, hyphenated_word,
                       TTranslate, TCandidate_count_structure,
                       TCompetitive_multi_out_pat_manip, TOutputs_of_a_pattern,
                       TWord_input_file, TWord_output_file,
@@ -110,7 +100,7 @@ int main(int argc, char* argv[]) {
         } else if (argc == 6 && (0 == strcmp(argv[1], "-u8"))) {
 
             utf_8 = true;
-            generator<Tindex, Tin_alph, Tval_type, Twt_type, Tcount_type, THword,
+            generator<std::size_t, unsigned, unsigned, unsigned, unsigned, hyphenated_word,
                       TTranslate, TCandidate_count_structure,
                       TCompetitive_multi_out_pat_manip, TOutputs_of_a_pattern,
                       TWord_input_file, TWord_output_file,

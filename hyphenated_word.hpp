@@ -11,13 +11,13 @@ namespace ptl {
 /**
  * \brief Class for holding info about hyphenated word.
  * \todo Remove 4 redundant growing arrays.
- * \tparam Tin_alph Element type.
- * \tparam Twt_type Weight type.
- * \tparam Tval_type Level type.
  */
-template <class Tin_alph, class Twt_type, class Tval_type>
-class hyphenated_word : public std::vector<Tin_alph> {
-    using base = std::vector<Tin_alph>;
+class hyphenated_word : public std::vector<unsigned> {
+    using base = std::vector<unsigned>;
+
+    using Tin_alph = unsigned;
+    using Twt_type = unsigned;
+    using Tval_type = unsigned;
     
 public:
     growing_array<hyphenation_type> type;
