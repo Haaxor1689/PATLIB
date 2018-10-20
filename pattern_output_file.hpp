@@ -5,8 +5,13 @@
 
 namespace ptl {
     
-template <class Tindex, class Tin_alph, class Tval_type, class TTranslate, class TOutputs_of_a_pattern>
 class pattern_output_file {
+
+    using Tindex = std::size_t;
+    using Tin_alph = unsigned;
+    using Tval_type = unsigned;
+    using  TTranslate = translate;
+    using TOutputs_of_a_pattern = outputs_of_a_pattern;
 
     TTranslate& translate;
     const std::string file_name;

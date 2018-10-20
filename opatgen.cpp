@@ -20,9 +20,6 @@ const char* opatgen_cvs_id = "$Id: opatgen.w,v 1.24 2001/12/03 17:51:13 antos Ex
 
 using namespace ptl;
 
-typedef pattern_output_file<std::size_t, unsigned, unsigned, translate,
-                            outputs_of_a_pattern> TPattern_output_file;
-
 typedef pass<std::size_t, unsigned, unsigned, unsigned,
              unsigned, hyphenated_word, translate, candidate_count_trie,
              competitive_multi_out_pat_manip, outputs_of_a_pattern,
@@ -75,7 +72,7 @@ int main(int argc, char* argv[]) {
                       translate, candidate_count_trie,
                       competitive_multi_out_pat_manip, outputs_of_a_pattern,
                       word_input_file, word_output_file,
-                      pattern_input_file, TPattern_output_file,
+                      pattern_input_file, pattern_output_file,
                       TPass, TLevel>
                     g(argv[1], argv[2], argv[3], argv[4]);
             g.do_all();
@@ -86,7 +83,7 @@ int main(int argc, char* argv[]) {
                       translate, candidate_count_trie,
                       competitive_multi_out_pat_manip, outputs_of_a_pattern,
                       word_input_file, word_output_file,
-                      pattern_input_file, TPattern_output_file,
+                      pattern_input_file, pattern_output_file,
                       TPass, TLevel>
                     g(argv[2], argv[3], argv[4], argv[5]);
             g.do_all();
