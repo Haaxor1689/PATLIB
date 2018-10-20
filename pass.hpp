@@ -4,16 +4,26 @@
 #include <iostream>
 
 #include "hyphenation_type.hpp"
+#include "translate.hpp"
+#include "ptl_mopm.hpp"
+#include "word_input_file.hpp"
 
 namespace ptl {
 
-template <class Tindex, class Tin_alph, class Tval_type, class Twt_type,
-          class Tcount_type, class THword, class TTranslate,
-          class TCandidate_count_structure,
-          class TCompetitive_multi_out_pat_manip,
-          class TOutputs_of_a_pattern,
-          class TWord_input_file>
 class pass {
+
+    using Tindex = std::size_t;
+    using Tin_alph = unsigned;
+    using Tval_type = unsigned;
+    using Twt_type = unsigned;
+    using Tcount_type = unsigned;
+    using THword = hyphenated_word;
+    using TTranslate = translate;
+    using TCandidate_count_structure = candidate_count_trie;
+    using TCompetitive_multi_out_pat_manip = competitive_multi_out_pat_manip;
+    using TOutputs_of_a_pattern = outputs_of_a_pattern;
+    using TWord_input_file = word_input_file;
+
 
     TTranslate& translate;
     const Tval_type hyph_level;
