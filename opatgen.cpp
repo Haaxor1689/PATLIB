@@ -13,7 +13,8 @@
 #include "level.hpp"
 #include "ptl_mopm.hpp"
 #include "version.hpp"
-#include "IO_word_manipulator.hpp"
+#include "io_word_manipulator.hpp"
+#include "io_reverse_mapping.hpp"
 
 const char* opatgen_version = "1.0";
 const char* opatgen_cvs_id = "$Id: opatgen.w,v 1.24 2001/12/03 17:51:13 antos Exp $";
@@ -22,23 +23,6 @@ using namespace std;
 using namespace ptl;
 
 bool utf_8;
-
-template <class Texternal, class Tinternal>
-class IO_reverse_mapping {
-protected:
-    map<Tinternal, vector<Texternal>> mapping;
-
-public:
-    void insert(const Tinternal& i, const vector<Texternal>& v) {
-        mapping[i] = v;
-    }
-
-    void add_to_string(const Tinternal& i, basic_string<Texternal>& s) {
-        typename map<Tinternal, vector<Texternal>>::const_iterator it = mapping.find(i);
-        s.insert(s.end(), it->second.begin(), it->second.end());
-    }
-
-};
 
 template <class Tindex, class Tnum_type, class THword>
 class Translate {
@@ -65,11 +49,11 @@ protected:
     Tindex left_hyphen_min;
     Tindex right_hyphen_min;
 
-    IO_word_manipulator<Tindex, Tfile_unit, Tclassified_symbol> classified_symbols;
+    io_word_manipulator<Tindex, Tfile_unit, Tclassified_symbol> classified_symbols;
 
-    IO_reverse_mapping<Tfile_unit, Tnum_type> xdig;
-    IO_reverse_mapping<Tfile_unit, typename THword::hyphenation_type> xhyf;
-    IO_reverse_mapping<Tfile_unit, Tnum_type> xext;
+    io_reverse_mapping<Tfile_unit, Tnum_type> xdig;
+    io_reverse_mapping<Tfile_unit, typename THword::hyphenation_type> xhyf;
+    io_reverse_mapping<Tfile_unit, Tnum_type> xext;
 
     Tnum_type get_next_internal_code(void) {
         ++max_in_alph;
