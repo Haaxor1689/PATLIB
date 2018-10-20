@@ -261,7 +261,7 @@ TCompetitive_multi_out_pat_manip;
 
 typedef Outputs_of_a_pattern<Tindex, Tval_type> TOutputs_of_a_pattern;
 
-typedef Word_input_file<THword, TTranslate, Tnum_type> TWord_input_file;
+typedef word_input_file<THword, TTranslate, Tnum_type> TWord_input_file;
 
 typedef Word_output_file<Tindex, THword, TTranslate>
 TWord_output_file;

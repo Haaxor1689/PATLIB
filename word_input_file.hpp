@@ -1,41 +1,58 @@
 #pragma once
 
+#include <iostream>
+#include <fstream>
+#include <string>
+
 namespace ptl {
     
 template <class THword, class TTranslate, class Tnum_type>
-class Word_input_file {
+class word_input_file {
 
-protected:
+    const bool utf_8;
+
     TTranslate& translate;
-    const char* file_name;
-    ifstream file;
+    const std::string file_name;
+    std::basic_ifstream<unsigned char> file;
 
-    unsigned lineno;
+    unsigned lineno = 0;
 
-    typedef typename TTranslate::Tfile_unit Tfile_unit;
     typedef typename TTranslate::classified_symbol Tclassified_symbol;
 
-    Tnum_type global_word_wt;
+    Tnum_type global_word_wt = 1;
 
 public:
-    Word_input_file(TTranslate& t, const char* fn):
-        translate(t), file_name(fn), file(file_name), lineno(0),
-        global_word_wt(1) {}
+    word_input_file(TTranslate& t, const char* fn, bool utf_8) : utf_8(utf_8), translate(t), file_name(fn), file(file_name) {}
 
-protected:
-    void handle_line(const basic_string<Tfile_unit>& s, THword& hw) {
+    bool get(THword& hw) {
+        hw.clear();
+        std::basic_string<unsigned char> s;
+
+        if (!getline(file, s)) {
+            return false;
+        }
+
+        ++lineno;
+
+        s.push_back(' ');
+        handle_line(s, hw);
+        return true;
+    }
+
+private:
+    void handle_line(const std::basic_string<unsigned char>& s, THword& hw) {
         hw.push_back(translate.get_edge_of_word());
         hw.weight[hw.size()] = global_word_wt;
 
         Tclassified_symbol i_class;
-        typename basic_string<Tfile_unit>::const_iterator i = s.begin();
-        vector<Tfile_unit> seq;
+        auto i = s.begin();
+        std::vector<unsigned char> seq;
         Tnum_type num;
 
         do {
             if (utf_8 && (*i & 0x80)) {
                 {
-                    Tfile_unit first_i = *i;
+                    unsigned char first_i = *i;
                     seq.clear();
                     while ((first_i & 0x80) && (*i & 0x80)) {
 
@@ -48,9 +65,8 @@ protected:
                         hw.push_back(i_class.second);
                         hw.weight[hw.size()] = global_word_wt;
                     } else {
-                        cerr << "! Error in " << file_name << " line " << lineno << ": "
-                                << "Multibyte sequence is invalid" << endl;
-                        throw ptl::exception("");
+                        std::cerr << "! Error in " << file_name << " line " << lineno << ": " << "Multibyte sequence is invalid" << std::endl;
+                        throw exception("");
                     }
                 }
             } else {
@@ -112,18 +128,17 @@ protected:
                         hw.push_back(i_class.second);
                         hw.weight[hw.size()] = global_word_wt;
                     } else {
-                        cerr << "! Error in " << file_name << " line " << lineno << ": "
-                                << "Escape sequence is invalid" << endl;
-                        cerr << "(Are you using correct encoding--the -u8 switch?)" << endl;
-                        throw ptl::exception("");
+                        std::cerr << "! Error in " << file_name << " line " << lineno << ": "
+                                << "Escape sequence is invalid" << std::endl;
+                        std::cerr << "(Are you using correct encoding--the -u8 switch?)" << std::endl;
+                        throw exception("");
                     }
 
                     break;
                 default:
-                    cerr << "! Error in " << file_name << " line " << lineno << ": "
-                            << "Invalid character in input data" << endl;
-                    throw ptl::exception("");
-                    break;
+                    std::cerr << "! Error in " << file_name << " line " << lineno << ": "
+                            << "Invalid character in input data" << std::endl;
+                    throw exception("");
                 }
             }
         } while (i != s.end());
@@ -131,20 +146,6 @@ protected:
         hw.push_back(translate.get_edge_of_word());
         hw.weight[hw.size()] = global_word_wt;
         hw.weight[0] = global_word_wt;
-    }
-
-public:
-    bool get(THword& hw) {
-        hw.clear();
-        basic_string<Tfile_unit> s;
-
-        if (!getline(file, s)) {
-            return false;
-        }
-        lineno++;
-        s.push_back(Tfile_unit(' '));
-        handle_line(s, hw);
-        return true;
     }
 
 };
