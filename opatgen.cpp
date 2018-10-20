@@ -32,7 +32,7 @@ protected:
     unsigned lineno;
 
     typedef typename TTranslate::Tfile_unit Tfile_unit;
-    typedef typename TTranslate::Tclassified_symbol Tclassified_symbol;
+    typedef typename TTranslate::classified_symbol Tclassified_symbol;
 
     Tnum_type global_word_wt;
 
@@ -63,7 +63,7 @@ protected:
                         first_i = first_i << 1;
                     }
                     translate.classify(seq, i_class);
-                    if (i_class.first == TTranslate::letter_class) {
+                    if (i_class.first == char_class::letter) {
                         hw.push_back(i_class.second);
                         hw.weight[hw.size()] = global_word_wt;
                     } else {
@@ -75,12 +75,12 @@ protected:
             } else {
                 translate.classify(*i, i_class);
                 switch (i_class.first) {
-                case TTranslate::space_class:
+                case char_class::space:
                     goto done;
-                case TTranslate::digit_class:
+                case char_class::digit:
                     if (i == s.begin()) {
                         num = 0;
-                        while (i_class.first == TTranslate::digit_class) {
+                        while (i_class.first == char_class::digit) {
                             num = 10 * num + i_class.second;
                             ++i;
                             translate.classify(*i, i_class);
@@ -89,7 +89,7 @@ protected:
                         global_word_wt = num;
                     } else {
                         num = 0;
-                        while (i_class.first == TTranslate::digit_class) {
+                        while (i_class.first == char_class::digit) {
                             num = 10 * num + i_class.second;
                             ++i;
                             translate.classify(*i, i_class);
@@ -97,37 +97,37 @@ protected:
                         hw.weight[hw.size()] = num;
                     }
                     break;
-                case TTranslate::hyf_class:
+                case char_class::hyf:
                     if (i_class.second == THword::correct || i_class.second == THword::past)
                         hw.type[hw.size()] = THword::correct;
                     ++i;
                     break;
-                case TTranslate::letter_class:
+                case char_class::letter:
                     hw.push_back(i_class.second);
                     hw.weight[hw.size()] = global_word_wt;
                     ++i;
                     break;
-                case TTranslate::escape_class:
+                case char_class::escape:
 
                     seq.clear();
                     seq.push_back(*i);
 
                     ++i;
                     translate.classify(*i, i_class);
-                    while (i_class.first == TTranslate::letter_class ||
-                           i_class.first == TTranslate::invalid_class) {
+                    while (i_class.first == char_class::letter ||
+                           i_class.first == char_class::invalid) {
                         seq.push_back(*i);
                         ++i;
                         translate.classify(*i, i_class);
                     }
 
-                    while (i_class.first == TTranslate::space_class && i != s.end()) {
+                    while (i_class.first == char_class::space && i != s.end()) {
                         ++i;
                         translate.classify(*i, i_class);
                     }
                     translate.classify(seq, i_class);
 
-                    if (i_class.first == TTranslate::letter_class) {
+                    if (i_class.first == char_class::letter) {
                         hw.push_back(i_class.second);
                         hw.weight[hw.size()] = global_word_wt;
                     } else {
@@ -180,7 +180,7 @@ protected:
     unsigned lineno;
 
     typedef typename TTranslate::Tfile_unit Tfile_unit;
-    typedef typename TTranslate::Tclassified_symbol Tclassified_symbol;
+    typedef typename TTranslate::classified_symbol Tclassified_symbol;
 
 public:
     Pattern_input_file(TTranslate& t, const char* fn):
@@ -214,7 +214,7 @@ protected:
                 }
 
                 translate.classify(seq, i_class);
-                if (i_class.first == TTranslate::letter_class) {
+                if (i_class.first == char_class::letter) {
                     v.push_back(i_class.second);
                     ++chars_read;
                 } else {
@@ -225,12 +225,12 @@ protected:
             } else {
                 translate.classify(*i, i_class);
                 switch (i_class.first) {
-                case TTranslate::space_class:
+                case char_class::space:
                     goto done;
-                case TTranslate::digit_class:
+                case char_class::digit:
 
                     num = 0;
-                    while (i_class.first == TTranslate::digit_class) {
+                    while (i_class.first == char_class::digit) {
                         num = 10 * num + i_class.second;
                         ++i;
                         translate.classify(*i, i_class);
@@ -239,34 +239,34 @@ protected:
                     o.insert(make_pair(chars_read, num));
 
                     break;
-                case TTranslate::letter_class:
+                case char_class::letter:
 
                     v.push_back(i_class.second);
                     ++chars_read;
                     ++i;
 
                     break;
-                case TTranslate::escape_class:
+                case char_class::escape:
 
                     seq.clear();
                     seq.push_back(*i);
 
                     ++i;
                     translate.classify(*i, i_class);
-                    while (i_class.first == TTranslate::letter_class ||
-                           i_class.first == TTranslate::invalid_class) {
+                    while (i_class.first == char_class::letter ||
+                           i_class.first == char_class::invalid) {
                         seq.push_back(*i);
                         ++i;
                         translate.classify(*i, i_class);
                     }
 
-                    while (i_class.first == TTranslate::space_class && i != s.end()) {
+                    while (i_class.first == char_class::space && i != s.end()) {
                         ++i;
                         translate.classify(*i, i_class);
                     }
                     translate.classify(seq, i_class);
 
-                    if (i_class.first == TTranslate::letter_class) {
+                    if (i_class.first == char_class::letter) {
                         v.push_back(i_class.second);
                         ++chars_read;
                     } else {
@@ -398,7 +398,7 @@ typedef unsigned Tnum_type;
 
 typedef hyphenated_word<Tin_alph, Twt_type, Tval_type> THword;
 
-typedef Translate<Tindex, Tin_alph, THword> TTranslate;
+typedef translate<Tindex, Tin_alph> TTranslate;
 
 typedef candidate_count_trie<Tindex, Tin_alph, Tcount_type, Tcount_type>
 TCandidate_count_structure;
