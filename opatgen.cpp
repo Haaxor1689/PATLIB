@@ -20,10 +20,6 @@ const char* opatgen_cvs_id = "$Id: opatgen.w,v 1.24 2001/12/03 17:51:13 antos Ex
 
 using namespace ptl;
 
-typedef level<std::size_t, unsigned, unsigned, unsigned,
-              unsigned, hyphenated_word, translate, candidate_count_trie,
-              competitive_multi_out_pat_manip, word_input_file, pass> TLevel;
-
 void print_banner() {
     std::cout << std::endl;
     std::cout << "Written and maintained by David Antos, xantos (at) fi.muni.cz" << std::endl;
@@ -68,7 +64,7 @@ int main(int argc, char* argv[]) {
                       competitive_multi_out_pat_manip, outputs_of_a_pattern,
                       word_input_file, word_output_file,
                       pattern_input_file, pattern_output_file,
-                      pass, TLevel>
+                      pass, level>
                     g(argv[1], argv[2], argv[3], argv[4]);
             g.do_all();
         } else if (argc == 6 && (0 == strcmp(argv[1], "-u8"))) {
@@ -79,7 +75,7 @@ int main(int argc, char* argv[]) {
                       competitive_multi_out_pat_manip, outputs_of_a_pattern,
                       word_input_file, word_output_file,
                       pattern_input_file, pattern_output_file,
-                      pass, TLevel>
+                      pass, level>
                     g(argv[2], argv[3], argv[4], argv[5]);
             g.do_all();
         } else {

@@ -3,15 +3,23 @@
 #include <iostream>
 
 #include "growing_array.hpp"
+#include "pass.hpp"
 
 namespace ptl {
 
-template <class Tindex, class Tin_alph, class Tval_type, class Twt_type,
-          class Tcount_type, class THword, class TTranslate,
-          class TCandidate_count_structure,
-          class TCompetitive_multi_out_pat_manip,
-          class TWord_input_file, class TPass>
 class level {
+
+    using Tindex = std::size_t;
+    using Tin_alph = unsigned;
+    using Tval_type = unsigned;
+    using Twt_type = unsigned;
+    using Tcount_type = unsigned;
+    using THword = hyphenated_word;
+    using TTranslate = translate;
+    using TCandidate_count_structure = candidate_count_trie;
+    using TCompetitive_multi_out_pat_manip = competitive_multi_out_pat_manip;
+    using TWord_input_file = word_input_file;
+    using TPass = pass;
 
     TTranslate& translate;
     const char* word_input_file_name;
