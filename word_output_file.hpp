@@ -7,8 +7,11 @@
 
 namespace ptl {
     
-template <class Tindex, class THword, class TTranslate>
 class word_output_file {
+
+    using Tindex = std::size_t;
+    using THword = hyphenated_word;
+    using TTranslate = translate;
 
     TTranslate& translate;
     const std::string file_name;
