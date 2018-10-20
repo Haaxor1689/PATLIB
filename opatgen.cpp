@@ -222,7 +222,7 @@ typedef Outputs_of_a_pattern<Tindex, Tval_type> TOutputs_of_a_pattern;
 
 typedef word_input_file<THword, TTranslate, Tnum_type> TWord_input_file;
 
-typedef Word_output_file<Tindex, THword, TTranslate>
+typedef word_output_file<Tindex, THword, TTranslate>
 TWord_output_file;
 
 typedef Pattern_input_file<Tindex, Tin_alph, Tval_type, TTranslate,
