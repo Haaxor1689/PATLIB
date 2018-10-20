@@ -20,9 +20,6 @@ const char* opatgen_cvs_id = "$Id: opatgen.w,v 1.24 2001/12/03 17:51:13 antos Ex
 
 using namespace ptl;
 
-typedef candidate_count_trie<std::size_t, unsigned, unsigned, unsigned>
-TCandidate_count_structure;
-
 typedef Competitive_multi_out_pat_manip<std::size_t, unsigned, unsigned>
 TCompetitive_multi_out_pat_manip;
 
@@ -40,12 +37,12 @@ typedef pattern_output_file<std::size_t, unsigned, unsigned, translate,
                             TOutputs_of_a_pattern> TPattern_output_file;
 
 typedef pass<std::size_t, unsigned, unsigned, unsigned,
-             unsigned, hyphenated_word, translate, TCandidate_count_structure,
+             unsigned, hyphenated_word, translate, candidate_count_trie,
              TCompetitive_multi_out_pat_manip, TOutputs_of_a_pattern,
              TWord_input_file> TPass;
 
 typedef level<std::size_t, unsigned, unsigned, unsigned,
-              unsigned, hyphenated_word, translate, TCandidate_count_structure,
+              unsigned, hyphenated_word, translate, candidate_count_trie,
               TCompetitive_multi_out_pat_manip, TWord_input_file, TPass> TLevel;
 
 void print_banner() {
@@ -88,7 +85,7 @@ int main(int argc, char* argv[]) {
         if (argc == 5) {
             utf_8 = false;
             generator<std::size_t, unsigned, unsigned, unsigned, unsigned, hyphenated_word,
-                      translate, TCandidate_count_structure,
+                      translate, candidate_count_trie,
                       TCompetitive_multi_out_pat_manip, TOutputs_of_a_pattern,
                       TWord_input_file, TWord_output_file,
                       TPattern_input_file, TPattern_output_file,
@@ -99,7 +96,7 @@ int main(int argc, char* argv[]) {
 
             utf_8 = true;
             generator<std::size_t, unsigned, unsigned, unsigned, unsigned, hyphenated_word,
-                      translate, TCandidate_count_structure,
+                      translate, candidate_count_trie,
                       TCompetitive_multi_out_pat_manip, TOutputs_of_a_pattern,
                       TWord_input_file, TWord_output_file,
                       TPattern_input_file, TPattern_output_file,

@@ -4,8 +4,13 @@
 
 namespace ptl {
 
-template <class Tpm_pointer, class Tin_alph, class Tcount_good, class Tcount_bad>
-class candidate_count_trie : public trie_pattern_manipulator<Tpm_pointer, Tin_alph, std::pair<Tcount_good, Tcount_bad>> {
+class candidate_count_trie : public trie_pattern_manipulator<std::size_t, unsigned, std::pair<unsigned, unsigned>> {
+
+    using Tpm_pointer = std::size_t;
+    using Tin_alph = unsigned;
+    using Tcount_good = unsigned;
+    using Tcount_bad = unsigned;
+
     using Tcount_pair = std::pair<Tcount_good, Tcount_bad>;
     using base = trie_pattern_manipulator<Tpm_pointer, Tin_alph, Tcount_pair>;
 
