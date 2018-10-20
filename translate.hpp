@@ -1,9 +1,19 @@
 #pragma once
 
+#include <utility>
+#include <vector>
+#include <iostream>
+#include <fstream>
+
+#include "io_word_manipulator.hpp"
+#include "io_reverse_mapping.hpp"
+
 namespace ptl {
 
 template <class Tindex, class Tnum_type, class THword>
 class Translate {
+
+    bool utf_8;
 
 public:
     typedef enum {
@@ -16,9 +26,7 @@ public:
         invalid_class
     } Tcharacter_class;
 
-    typedef unsigned char Tfile_unit;
-
-    typedef pair<Tcharacter_class, Tnum_type> Tclassified_symbol;
+    typedef std::pair<Tcharacter_class, Tnum_type> Tclassified_symbol;
 
 protected:
     Tnum_type edge_of_word;
@@ -27,30 +35,30 @@ protected:
     Tindex left_hyphen_min;
     Tindex right_hyphen_min;
 
-    io_word_manipulator<Tindex, Tfile_unit, Tclassified_symbol> classified_symbols;
+    io_word_manipulator<Tindex, unsigned char, Tclassified_symbol> classified_symbols;
 
-    io_reverse_mapping<Tfile_unit, Tnum_type> xdig;
-    io_reverse_mapping<Tfile_unit, typename THword::hyphenation_type> xhyf;
-    io_reverse_mapping<Tfile_unit, Tnum_type> xext;
+    io_reverse_mapping<unsigned char, Tnum_type> xdig;
+    io_reverse_mapping<unsigned char, typename THword::hyphenation_type> xhyf;
+    io_reverse_mapping<unsigned char, Tnum_type> xext;
 
-    Tnum_type get_next_internal_code(void) {
+    Tnum_type get_next_internal_code() {
         ++max_in_alph;
         return max_in_alph;
     }
 
 public:
-    void classify(const Tfile_unit& c, Tclassified_symbol& o) {
+    void classify(const unsigned char& c, Tclassified_symbol& o) {
         classified_symbols.word_output(c, o);
     }
 
-    void classify(const vector<Tfile_unit>& vc, Tclassified_symbol& o) {
+    void classify(const std::vector<unsigned char>& vc, Tclassified_symbol& o) {
         classified_symbols.word_last_output(vc, o);
     }
 
 protected:
-    void prepare_fixed_defaults(void) {
+    void prepare_fixed_defaults() {
         Tnum_type d;
-        vector<Tfile_unit> repres;
+        std::vector<unsigned char> repres;
 
         for (d = 0; d <= 9; ++d) {
             classified_symbols.hard_insert_pattern((d + '0'),
@@ -60,17 +68,17 @@ protected:
             xdig.insert(d, repres);
         }
 
-        classified_symbols.hard_insert_pattern(' ', make_pair(space_class, 0));
-        classified_symbols.hard_insert_pattern(9, make_pair(space_class, 0));
+        classified_symbols.hard_insert_pattern(' ', std::make_pair(space_class, 0));
+        classified_symbols.hard_insert_pattern(9, std::make_pair(space_class, 0));
 
         edge_of_word = get_next_internal_code();
-        vector<Tfile_unit> edge_of_word_printable;
+        std::vector<unsigned char> edge_of_word_printable;
         edge_of_word_printable.push_back('.');
         xext.insert(edge_of_word, edge_of_word_printable);
     }
 
-    void prepare_default_hyfs(void) {
-        vector<Tfile_unit> repres;
+    void prepare_default_hyfs() {
+        std::vector<unsigned char> repres;
 
         classified_symbols.hard_insert_pattern('.', make_pair(hyf_class,
                                                               THword::wrong));
@@ -89,11 +97,11 @@ protected:
         xhyf.insert(THword::past, repres);
     }
 
-    void prepare_default_alphabet(void) {
-        vector<Tfile_unit> repres;
+    void prepare_default_alphabet() {
+        std::vector<unsigned char> repres;
         Tnum_type internal;
 
-        for (Tfile_unit c = 'a'; c <= 'z'; c++) {
+        for (unsigned char c = 'a'; c <= 'z'; c++) {
             internal = get_next_internal_code();
             classified_symbols.hard_insert_pattern(c, make_pair(letter_class,
                                                                 internal));
@@ -105,7 +113,7 @@ protected:
         }
     }
 
-    void handle_preamble_of_translate(const basic_string<Tfile_unit>& s) {
+    void handle_preamble_of_translate(const std::basic_string<unsigned char>& s) {
         Tindex n = 0;
         bool bad = false;
         Tclassified_symbol cs;
@@ -157,17 +165,17 @@ protected:
             bad = false;
             Tindex n1;
             Tindex n2;
-            cout << "! Values of left_hyphen_min and right_hyphen_min in translate";
-            cout << " are invalid." << endl;
+            std::cout << "! Values of left_hyphen_min and right_hyphen_min in translate";
+            std::cout << " are invalid." << std::endl;
             do {
-                cout << "left_hyphen_min, right_hyphen_min: ";
-                cin >> n1 >> n2;
+                std::cout << "left_hyphen_min, right_hyphen_min: ";
+                std::cin >> n1 >> n2;
                 if (n1 >= 1 && n2 >= 1) {
                     left_hyphen_min = n1;
                     right_hyphen_min = n2;
                 } else {
                     n1 = 0;
-                    cout << "Specify 1<=left_hyphen_min, right_hyphen_min!" << endl;
+                    std::cout << "Specify 1<=left_hyphen_min, right_hyphen_min!" << std::endl;
                 }
             } while (!n1 > 0);
         }
@@ -185,7 +193,7 @@ protected:
                     continue;
                 if (cs.first == invalid_class) {
 
-                    vector<Tfile_unit> v;
+                    std::vector<unsigned char> v;
                     v.push_back(s[i + 3]);
                     xhyf.insert(static_cast<hyphenation_type>(i), v);
                     classified_symbols.hard_insert_pattern(s[i + 3],
@@ -199,20 +207,18 @@ protected:
         }
     }
 
-    void handle_line_of_translate(basic_string<Tfile_unit>& s,
-                                  const unsigned& lineno) {
+    void handle_line_of_translate(std::basic_string<unsigned char>& s, const unsigned& lineno) {
         if (s.length() == 0)
             return;
 
         bool primary_repres = true;
-        vector<Tfile_unit> letter_repres;
+        std::vector<unsigned char> letter_repres;
         Tnum_type internal;
-        Tfile_unit delimiter = *s.begin();
+        unsigned char delimiter = *s.begin();
 
         s = s + delimiter + delimiter;
 
-        basic_string<Tfile_unit>::const_iterator i = s.begin();
-
+        auto i = s.begin();
         while (true) {
             ++i;
             if (*i == delimiter)
@@ -231,48 +237,47 @@ protected:
                 if (letter_repres.size() == 1) {
                     classify(*letter_repres.begin(), cs);
                     if (utf_8 && *letter_repres.begin() > 127) {
-                        cout << "! Warning: Translate file, line " << lineno << ":" << endl;
-                        cout << "There is single 8-bit ASCII character, it is probably an error ";
-                        cout << "in UTF-8 mode" << endl;
+                        std::cout << "! Warning: Translate file, line " << lineno << ":" << std::endl;
+                        std::cout << "There is single 8-bit ASCII character, it is probably an error ";
+                        std::cout << "in UTF-8 mode" << std::endl;
                     }
                     if (cs.first == invalid_class) {
                         classified_symbols.hard_insert_pattern(letter_repres,
                                                                make_pair(letter_class, internal));
                     } else {
-                        cerr << "! Error: Translate file, line " << lineno << ":" << endl;
-                        cerr << "Trying to redefine previously defined character" << endl;
+                        std::cerr << "! Error: Translate file, line " << lineno << ":" << std::endl;
+                        std::cerr << "Trying to redefine previously defined character" << std::endl;
                         throw ptl::exception("");
                     }
                 } else {
                     classify(*letter_repres.begin(), cs);
                     if (cs.first == invalid_class)
-                        classified_symbols.hard_insert_pattern(*letter_repres.begin(),
-                                                               make_pair(escape_class, 0));
+                        classified_symbols.hard_insert_pattern(*letter_repres.begin(), std::make_pair(escape_class, 0));
                     classify(*letter_repres.begin(), cs);
                     if (cs.first != escape_class) {
-                        cerr << "! Error: Translate file, line " << lineno << ":" << endl;
-                        cerr << "The first symbol of multi-char or UTF-8 sequence has been ";
-                        cerr << "used before";
-                        cerr << endl << "as non-escape character" << endl;
+                        std::cerr << "! Error: Translate file, line " << lineno << ":" << std::endl;
+                        std::cerr << "The first symbol of multi-char or UTF-8 sequence has been ";
+                        std::cerr << "used before";
+                        std::cerr << std::endl << "as non-escape character" << std::endl;
                         throw ptl::exception("");
                     }
                     classify(letter_repres, cs);
                     if (cs.first != invalid_class) {
-                        cerr << "! Error: Translate file, line " << lineno << ":" << endl;
-                        cerr << "Trying to redefine previously defined character" << endl;
+                        std::cerr << "! Error: Translate file, line " << lineno << ":" << std::endl;
+                        std::cerr << "Trying to redefine previously defined character" << std::endl;
                         throw ptl::exception("");
                     }
 
                     if (utf_8) {
-                        Tfile_unit first = *letter_repres.begin();
+                        unsigned char first = *letter_repres.begin();
                         unsigned expected_length = 0;
                         while (first & 0x80) {
                             expected_length++;
                             first = first << 1;
                         }
                         if (letter_repres.size() != expected_length) {
-                            cout << "! Warning: Translate file, line " << lineno << ":" << endl;
-                            cout << "UTF-8 sequence seems to be broken, it is probably an error." << endl;
+                            std::cout << "! Warning: Translate file, line " << lineno << ":" << std::endl;
+                            std::cout << "UTF-8 sequence seems to be broken, it is probably an error." << std::endl;
                         }
                     }
 
@@ -288,52 +293,52 @@ protected:
 
     void read_translate(const char* tra) {
         unsigned lineno = 1;
-        ifstream transl(tra);
-        basic_string<Tfile_unit> s;
+        std::basic_ifstream<unsigned char> transl(tra);
+        std::basic_string<unsigned char> s;
 
-        if (getline(transl, s)) {
+        if (std::getline(transl, s)) {
             handle_preamble_of_translate(s);
-            while (getline(transl, s))
+            while (std::getline(transl, s))
                 handle_line_of_translate(s, ++lineno);
         } else {
-            cout << "Translate file does not exist or is empty. Defaults used." << endl;
+            std::cout << "Translate file does not exist or is empty. Defaults used." << std::endl;
             prepare_default_alphabet();
             left_hyphen_min = 2;
             right_hyphen_min = 3;
         }
 
-        cout << "left_hyphen_min = " << left_hyphen_min << ", right_hyphen_min = "
-                << right_hyphen_min << endl
-                << max_in_alph - edge_of_word << " letters" << endl;
+        std::cout << "left_hyphen_min = " << left_hyphen_min << ", right_hyphen_min = "
+                << right_hyphen_min << std::endl
+                << max_in_alph - edge_of_word << " letters" << std::endl;
     }
 
 public:
     Translate(const char* tra):
         max_in_alph(0),
-        classified_symbols(255, make_pair(invalid_class, 0)) {
+        classified_symbols(255, std::make_pair(invalid_class, 0)) {
         prepare_fixed_defaults();
         prepare_default_hyfs();
         read_translate(tra);
     }
 
-    Tindex get_max_in_alph(void) {
+    Tindex get_max_in_alph() {
         return max_in_alph;
     }
 
-    Tindex get_right_hyphen_min(void) {
+    Tindex get_right_hyphen_min() {
         return right_hyphen_min;
     }
 
-    Tindex get_left_hyphen_min(void) {
+    Tindex get_left_hyphen_min() {
         return left_hyphen_min;
     }
 
-    Tfile_unit get_edge_of_word(void) {
+    unsigned char get_edge_of_word() {
         return edge_of_word;
     }
 
-    void get_xdig(Tnum_type i, basic_string<Tfile_unit>& e) {
-        basic_string<Tfile_unit> inv_rep;
+    void get_xdig(Tnum_type i, std::basic_string<unsigned char>& e) {
+        std::basic_string<unsigned char> inv_rep;
         while (i > 0) {
             xdig.add_to_string((i % 10), inv_rep);
             i = Tnum_type(i / 10);
@@ -341,14 +346,13 @@ public:
         e.append(inv_rep.rbegin(), inv_rep.rend());
     }
 
-    void get_xhyf(const typename THword::hyphenation_type& i, basic_string<Tfile_unit>& e) {
+    void get_xhyf(const typename THword::hyphenation_type& i, std::basic_string<unsigned char>& e) {
         xhyf.add_to_string(i, e);
     }
 
-    void get_xext(const Tnum_type& i, basic_string<Tfile_unit>& e) {
+    void get_xext(const Tnum_type& i, std::basic_string<unsigned char>& e) {
         xext.add_to_string(i, e);
     }
 };
-
     
 } // namespace ptl
