@@ -6,8 +6,11 @@
 
 namespace ptl {
     
-template <class THword, class TTranslate, class Tnum_type>
 class word_input_file {
+
+    using THword = hyphenated_word;
+    using TTranslate = translate;
+    using Tnum_type = unsigned;
 
     const bool utf_8;
 
