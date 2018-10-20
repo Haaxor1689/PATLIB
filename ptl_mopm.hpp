@@ -9,11 +9,11 @@
 namespace ptl {
 
 template <class Tposition, class Toutput>
-class Outputs_of_a_pattern : public std::multimap<Tposition, Toutput> {};
+class outputs_of_a_pattern : public std::multimap<Tposition, Toutput> {};
 
 template <class Tposition, class Toutput>
-class Outputs_of_patterns : public std::set<Outputs_of_a_pattern<Tposition, Toutput>> {
-    using node_type = Outputs_of_a_pattern<Tposition, Toutput>;
+class Outputs_of_patterns : public std::set<outputs_of_a_pattern<Tposition, Toutput>> {
+    using node_type = outputs_of_a_pattern<Tposition, Toutput>;
     using base = std::set<node_type>;
     using node_iterator = typename node_type::iterator;
     
@@ -32,7 +32,7 @@ public:
 };
 
 template <class Tindex, class Tin_alph, class Tout_alph>
-class Multi_output_pattern_manipulator {
+class multi_output_pattern_manipulator {
 protected:
     using output_type = Outputs_of_patterns<Tindex, Tout_alph>;
     using output_iterator = typename output_type::iterator;
@@ -41,20 +41,20 @@ protected:
     trie_pattern_manipulator<Tindex, Tin_alph, output_iterator> words;
 
 public:
-    Multi_output_pattern_manipulator(const Tin_alph& max_i_a) : words(max_i_a, outputs.get_empty_iter()) {}
+    multi_output_pattern_manipulator(const Tin_alph& max_i_a) : words(max_i_a, outputs.get_empty_iter()) {}
 
-    Multi_output_pattern_manipulator(Multi_output_pattern_manipulator& old) : words(old.get_max_in_alph(), outputs.get_empty_iter()) {
+    multi_output_pattern_manipulator(multi_output_pattern_manipulator& old) : words(old.get_max_in_alph(), outputs.get_empty_iter()) {
         std::vector<Tin_alph> w;
-        Outputs_of_a_pattern<Tindex, Tout_alph> o;
+        outputs_of_a_pattern<Tindex, Tout_alph> o;
 
         old.init_walk_through();
         while (old.get_next_pattern(w, o))
-            for (typename Outputs_of_a_pattern<Tindex, Tout_alph>::iterator i = o.begin();
+            for (typename outputs_of_a_pattern<Tindex, Tout_alph>::iterator i = o.begin();
                  i != o.end(); ++i)
                 this->insert_pattern(w, i->first, i->second);
     }
 
-    virtual ~Multi_output_pattern_manipulator() {}
+    virtual ~multi_output_pattern_manipulator() {}
 
     virtual Tindex get_max_in_alph() const {
         return words.get_max_in_alph();
@@ -68,14 +68,14 @@ public:
         words.init_walk_through();
     }
 
-    virtual bool get_next_pattern(std::vector<Tin_alph>& w, Outputs_of_a_pattern<Tindex, Tout_alph>& o) {
+    virtual bool get_next_pattern(std::vector<Tin_alph>& w, outputs_of_a_pattern<Tindex, Tout_alph>& o) {
         output_iterator i;
         bool ret_val = words.get_next_pattern(w, i);
         o = *i;
         return ret_val;
     }
 
-    void word_output(const std::vector<Tin_alph>& w, Outputs_of_a_pattern<Tindex, Tout_alph>& o) {
+    void word_output(const std::vector<Tin_alph>& w, outputs_of_a_pattern<Tindex, Tout_alph>& o) {
         std::vector<output_iterator> out_pointers;
         words.word_output(w, out_pointers);
 
@@ -87,14 +87,14 @@ public:
         }
     }
 
-    void word_last_output(const std::vector<Tin_alph>& w, Outputs_of_a_pattern<Tindex, Tout_alph>& o) {
+    void word_last_output(const std::vector<Tin_alph>& w, outputs_of_a_pattern<Tindex, Tout_alph>& o) {
         output_iterator i;
         words.word_last_output(w, i);
         o = *i;
     }
 
     void insert_pattern(const std::vector<Tin_alph>& w, const Tindex& p, const Tout_alph& v, bool with_erase = false) {
-        Outputs_of_a_pattern<Tindex, Tout_alph> o;
+        outputs_of_a_pattern<Tindex, Tout_alph> o;
 
         word_last_output(w, o);
         if (with_erase) {
@@ -107,8 +107,8 @@ public:
 
     void delete_values(const Tout_alph& v) {
         std::vector<Tin_alph> w;
-        Outputs_of_a_pattern<Tindex, Tout_alph> o;
-        Outputs_of_a_pattern<Tindex, Tout_alph> n;
+        outputs_of_a_pattern<Tindex, Tout_alph> o;
+        outputs_of_a_pattern<Tindex, Tout_alph> n;
 
         init_walk_through();
         while (get_next_pattern(w, o)) {
@@ -121,7 +121,7 @@ public:
     }
 
     void delete_position(const std::vector<Tin_alph>& w, const Tindex& p) {
-        Outputs_of_a_pattern<Tindex, Tin_alph> o;
+        outputs_of_a_pattern<Tindex, Tin_alph> o;
 
         word_last_output(w, o);
         o.erase(p);
@@ -144,17 +144,17 @@ public:
 };
 
 template <class Tindex, class Tin_alph, class Tout_alph>
-class Competitive_multi_out_pat_manip : public Multi_output_pattern_manipulator<Tindex, Tin_alph, Tout_alph> {
-    using base = Multi_output_pattern_manipulator<Tindex, Tin_alph, Tout_alph>;
+class competitive_multi_out_pat_manip : public multi_output_pattern_manipulator<Tindex, Tin_alph, Tout_alph> {
+    using base = multi_output_pattern_manipulator<Tindex, Tin_alph, Tout_alph>;
 
 public:
-    Competitive_multi_out_pat_manip(const Tin_alph& max_i_a) : base(max_i_a) {}
+    competitive_multi_out_pat_manip(const Tin_alph& max_i_a) : base(max_i_a) {}
 
-    Competitive_multi_out_pat_manip(Competitive_multi_out_pat_manip& old) : base(old) {}
+    competitive_multi_out_pat_manip(competitive_multi_out_pat_manip& old) : base(old) {}
 
-    ~Competitive_multi_out_pat_manip() override {}
+    ~competitive_multi_out_pat_manip() override {}
 
-    void competitive_pattern_output(const std::vector<Tin_alph>& w, Outputs_of_a_pattern<Tindex, Tout_alph>& o, const Tout_alph& ignore_bigger) {
+    void competitive_pattern_output(const std::vector<Tin_alph>& w, outputs_of_a_pattern<Tindex, Tout_alph>& o, const Tout_alph& ignore_bigger) {
         o.clear();
         Tindex s = 0;
         for (typename std::vector<Tin_alph>::const_iterator i = w.begin(); i != w.end(); ++i) {
@@ -165,7 +165,7 @@ public:
     }
 
 protected:
-    void competitive_word_output(const std::vector<Tin_alph>& w, Outputs_of_a_pattern<Tindex, Tout_alph>& o, const Tindex& s, const Tout_alph& ignore_bigger) {
+    void competitive_word_output(const std::vector<Tin_alph>& w, outputs_of_a_pattern<Tindex, Tout_alph>& o, const Tindex& s, const Tout_alph& ignore_bigger) {
         std::vector<typename base::output_iterator> out_pointers;
         base::words.word_output(w, out_pointers);
         

@@ -20,10 +20,9 @@ const char* opatgen_cvs_id = "$Id: opatgen.w,v 1.24 2001/12/03 17:51:13 antos Ex
 
 using namespace ptl;
 
-typedef Competitive_multi_out_pat_manip<std::size_t, unsigned, unsigned>
-TCompetitive_multi_out_pat_manip;
+typedef competitive_multi_out_pat_manip<std::size_t, unsigned, unsigned> TCompetitive_multi_out_pat_manip;
 
-typedef Outputs_of_a_pattern<std::size_t, unsigned> TOutputs_of_a_pattern;
+typedef outputs_of_a_pattern<std::size_t, unsigned> TOutputs_of_a_pattern;
 
 typedef word_input_file<hyphenated_word, translate, unsigned> TWord_input_file;
 
