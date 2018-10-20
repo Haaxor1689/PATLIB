@@ -1,19 +1,9 @@
 #include <iostream>
 #include <string>
 
-#include "candidate_count_trie.hpp"
 #include "exception.hpp"
 #include "generator.hpp"
-#include "hyphenated_word.hpp"
-#include "pass.hpp"
-#include "level.hpp"
-#include "ptl_mopm.hpp"
 #include "version.hpp"
-#include "translate.hpp"
-#include "word_input_file.hpp"
-#include "word_output_file.hpp"
-#include "pattern_input_file.hpp"
-#include "pattern_output_file.hpp"
 
 const char* opatgen_version = "1.0";
 const char* opatgen_cvs_id = "$Id: opatgen.w,v 1.24 2001/12/03 17:51:13 antos Exp $";
@@ -59,24 +49,12 @@ int main(int argc, char* argv[]) {
     try {
         if (argc == 5) {
             utf_8 = false;
-            generator<std::size_t, unsigned, unsigned, unsigned, unsigned, hyphenated_word,
-                      translate, candidate_count_trie,
-                      competitive_multi_out_pat_manip, outputs_of_a_pattern,
-                      word_input_file, word_output_file,
-                      pattern_input_file, pattern_output_file,
-                      pass, level>
-                    g(argv[1], argv[2], argv[3], argv[4]);
+            generator g(argv[1], argv[2], argv[3], argv[4]);
             g.do_all();
         } else if (argc == 6 && (0 == strcmp(argv[1], "-u8"))) {
 
             utf_8 = true;
-            generator<std::size_t, unsigned, unsigned, unsigned, unsigned, hyphenated_word,
-                      translate, candidate_count_trie,
-                      competitive_multi_out_pat_manip, outputs_of_a_pattern,
-                      word_input_file, word_output_file,
-                      pattern_input_file, pattern_output_file,
-                      pass, level>
-                    g(argv[2], argv[3], argv[4], argv[5]);
+            generator g(argv[2], argv[3], argv[4], argv[5]);
             g.do_all();
         } else {
             std::cout << "opatgen: needs some arguments" << std::endl
