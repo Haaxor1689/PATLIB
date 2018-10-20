@@ -20,7 +20,7 @@ class pattern_input_file {
     unsigned lineno = 0;
 
 public:
-    pattern_input_file(translate& t, const char* fn, bool utf_8) : utf_8(utf_8), _translate(t), file_name(fn), file(file_name) {}
+    pattern_input_file(translate& t, const std::string& fn, bool utf_8) : utf_8(utf_8), _translate(t), file_name(fn), file(file_name) {}
 
     bool get(std::vector<Tin_alph>& v, outputs_of_a_pattern& o) {
         v.clear();

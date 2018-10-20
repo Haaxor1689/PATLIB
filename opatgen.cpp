@@ -45,16 +45,12 @@ int main(int argc, char* argv[]) {
 
     print_banner();
     
-    bool utf_8;
     try {
         if (argc == 5) {
-            utf_8 = false;
-            generator g(argv[1], argv[2], argv[3], argv[4]);
+            generator g(argv[1], argv[2], argv[3], argv[4], false);
             g.do_all();
         } else if (argc == 6 && (0 == strcmp(argv[1], "-u8"))) {
-
-            utf_8 = true;
-            generator g(argv[2], argv[3], argv[4], argv[5]);
+            generator g(argv[2], argv[3], argv[4], argv[5], true);
             g.do_all();
         } else {
             std::cout << "opatgen: needs some arguments" << std::endl

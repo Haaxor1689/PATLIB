@@ -12,7 +12,7 @@ class pattern_output_file {
     std::basic_ofstream<unsigned char> file;
 
 public:
-    pattern_output_file(translate& t, const char* fn) : _translate(t), file_name(fn), file(file_name) {}
+    pattern_output_file(translate& t, const std::string& fn) : _translate(t), file_name(fn), file(file_name) {}
 
     void put(const std::vector<Tin_alph>& v, const outputs_of_a_pattern& o) {
         outputs_of_a_pattern::const_iterator oi;

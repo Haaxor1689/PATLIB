@@ -45,7 +45,7 @@ private:
 
 public:
 
-    translate(const char* tra, bool utf_8) : utf_8(utf_8) {
+    translate(const std::string& tra, bool utf_8) : utf_8(utf_8) {
         prepare_fixed_defaults();
         prepare_default_hyfs();
         read_translate(tra);
@@ -326,7 +326,7 @@ protected:
         }
     }
 
-    void read_translate(const char* tra) {
+    void read_translate(const std::string& tra) {
         unsigned lineno = 1;
         std::basic_ifstream<unsigned char> transl(tra);
         std::basic_string<unsigned char> s;

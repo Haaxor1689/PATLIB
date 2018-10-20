@@ -19,7 +19,7 @@ class word_input_file {
     unsigned global_word_wt = 1;
 
 public:
-    word_input_file(translate& t, const char* fn, bool utf_8) : utf_8(utf_8), _translate(t), file_name(fn), file(file_name) {}
+    word_input_file(translate& t, const std::string& fn, bool utf_8) : utf_8(utf_8), _translate(t), file_name(fn), file(file_name) {}
 
     bool get(hyphenated_word& hw) {
         hw.clear();

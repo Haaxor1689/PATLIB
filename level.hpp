@@ -11,7 +11,7 @@ namespace ptl {
 class level {
 
     translate& _translate;
-    const char* word_input_file_name;
+    const std::string word_input_file_name;
     const Tval_type hyph_level;
     const Tval_type hopeless_hyph_val;
     const std::size_t left_hyphen_min;
@@ -25,7 +25,7 @@ class level {
     Tcount_type thresh;
 
 public:
-    level(translate& tra, const char* i_d_f_n,
+    level(translate& tra, const std::string& i_d_f_n,
           const Tval_type& l, const Tval_type& h,
           const std::size_t& lhm, const std::size_t& rhm,
           competitive_multi_out_pat_manip& p):

@@ -19,6 +19,8 @@ namespace ptl {
 
 class generator {
 
+    bool utf_8;
+
     translate _translate;
     const std::string name;
     const std::string word_input_file_name;
@@ -31,8 +33,10 @@ class generator {
     std::size_t right_hyphen_min;
 
 public:
-    generator(const std::string& dic, const std::string& pat, const std::string& out, const std::string& tra):
-        _translate(tra), word_input_file_name(dic),
+    generator(const std::string& dic, const std::string& pat, const std::string& out, const std::string& tra, bool utf_8) :
+        utf_8(utf_8),
+        _translate(tra, utf_8),
+        word_input_file_name(dic),
         pattern_input_file_name(pat),
         pattern_output_file_name(out),
         patterns(_translate.get_max_in_alph()),
@@ -53,7 +57,7 @@ public:
         std::vector<Tin_alph> v;
         outputs_of_a_pattern o;
 
-        pattern_input_file file(_translate, pattern_input_file_name);
+        pattern_input_file file(_translate, pattern_input_file_name, utf_8);
 
         while (file.get(v, o)) {
             if (v.size() > 0) {
@@ -98,7 +102,7 @@ public:
 
         hyphenated_word w;
         word_output_file o_f(_translate, file_name);
-        word_input_file i_f(_translate, word_input_file_name);
+        word_input_file i_f(_translate, word_input_file_name, utf_8);
         pass pass(_translate, word_input_file_name,
                    level_value, fake_level_value,
                    left_hyphen_min, right_hyphen_min,

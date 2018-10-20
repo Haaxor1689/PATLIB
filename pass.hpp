@@ -43,12 +43,12 @@ class pass {
     hyphenation_type bad_dot;
 
 public:
-    pass(translate& tra, const char* i_d_f_n,
+    pass(translate& tra, const std::string& i_d_f_n,
          const Tval_type& l, const Tval_type& h,
          const std::size_t& lhm, const std::size_t& rhm,
          const std::size_t& p_l, const std::size_t& p_d,
          const Twt_type& g_w, const Twt_type& b_w, const Twt_type& t,
-         competitive_multi_out_pat_manip& pat) :
+         competitive_multi_out_pat_manip& pat, bool utf_8) :
         _translate(tra),
         hyph_level(l), hopeless_hyph_val(h),
         left_hyphen_min(lhm), right_hyphen_min(rhm),
@@ -57,7 +57,7 @@ public:
         patterns(pat),
         good_count(0), bad_count(0), miss_count(0),
         candidates(patterns.get_max_in_alph(), 0, 0),
-        word_input(_translate, i_d_f_n) {
+        word_input(_translate, i_d_f_n, utf_8) {
         hyf_min = left_hyphen_min + 1;
         hyf_max = right_hyphen_min + 1;
         hyf_len = hyf_min + hyf_max;
