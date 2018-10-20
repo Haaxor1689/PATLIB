@@ -1,31 +1,47 @@
 #pragma once
 
+#include <fstream>
+#include <iostream>
+#include <string>
+
 namespace ptl {
     
-template <class Tindex, class Tin_alph, class Tval_type,
-          class TTranslate, class TOutputs_of_a_pattern>
-class Pattern_input_file {
+template <class Tindex, class Tin_alph, class Tval_type, class TTranslate, class TOutputs_of_a_pattern>
+class pattern_input_file {
 
-protected:
+    const bool utf_8;
+
     TTranslate& translate;
-    const char* file_name;
-    ifstream file;
+    const std::string file_name;
+    std::basic_ifstream<unsigned char> file;
 
-    unsigned lineno;
+    unsigned lineno = 0;
 
-    typedef typename TTranslate::Tfile_unit Tfile_unit;
     typedef typename TTranslate::classified_symbol Tclassified_symbol;
 
 public:
-    Pattern_input_file(TTranslate& t, const char* fn):
-        translate(t), file_name(fn), file(file_name), lineno(0) {}
+    pattern_input_file(TTranslate& t, const char* fn, bool utf_8) : utf_8(utf_8), translate(t), file_name(fn), file(file_name) {}
 
-protected:
-    void handle_line(const basic_string<Tfile_unit>& s, vector<Tin_alph>& v,
-                     TOutputs_of_a_pattern& o) {
+    bool get(std::vector<Tin_alph>& v, TOutputs_of_a_pattern& o) {
+        v.clear();
+        o.clear();
+        std::basic_string<unsigned char> s;
+
+        if (!std::getline(file, s)) {
+            return false;
+        }
+
+        lineno++;
+        s.push_back(' ');
+        handle_line(s, v, o);
+        return true;
+    }
+
+private:
+    void handle_line(const std::basic_string<unsigned char>& s, std::vector<Tin_alph>& v, TOutputs_of_a_pattern& o) {
         Tclassified_symbol i_class;
-        typename basic_string<Tfile_unit>::const_iterator i = s.begin();
-        vector<Tfile_unit> seq;
+        auto i = s.begin();
+        std::vector<unsigned char> seq;
         Tval_type num;
 
         Tindex chars_read = 0;
@@ -36,12 +52,12 @@ protected:
                 ++i;
                 continue;
             }
+
             if (utf_8 && *i > 127) {
 
-                Tfile_unit first_i = *i;
+                unsigned char first_i = *i;
                 seq.clear();
-                while ((first_i & 0x80) && (*i & 0x80)) {
-
+                while (first_i & 0x80 && *i & 0x80) {
                     seq.push_back(*i);
                     ++i;
                     first_i = first_i << 1;
@@ -52,9 +68,8 @@ protected:
                     v.push_back(i_class.second);
                     ++chars_read;
                 } else {
-                    cerr << "! Error in " << file_name << " line " << lineno << ": "
-                            << "Multibyte sequence is invalid" << endl;
-                    throw ptl::exception("");
+                    std::cerr << "! Error in " << file_name << " line " << lineno << ": " << "Multibyte sequence is invalid" << std::endl;
+                    throw exception("");
                 }
             } else {
                 translate.classify(*i, i_class);
@@ -104,36 +119,21 @@ protected:
                         v.push_back(i_class.second);
                         ++chars_read;
                     } else {
-                        cerr << "! Error in " << file_name << " line " << lineno << ": "
-                                << "Escape sequence is invalid" << endl;
-                        cerr << "(Are you using correct encoding--the -u8 switch?)" << endl;
-                        throw ptl::exception("");
+                        std::cerr << "! Error in " << file_name << " line " << lineno << ": "
+                                  << "Escape sequence is invalid" << std::endl;
+                        std::cerr << "(Are you using correct encoding--the -u8 switch?)" << std::endl;
+                        throw exception("");
                     }
 
                     break;
                 default:
-                    cerr << "! Error in " << file_name << " line " << lineno << ": "
-                            << "Invalid character in pattern data" << endl;
-                    throw ptl::exception("");
+                    std::cerr << "! Error in " << file_name << " line " << lineno << ": "
+                              << "Invalid character in pattern data" << std::endl;
+                    throw exception("");
                 }
             }
         } while (i != s.end());
     done:;
-    }
-
-public:
-    bool get(vector<Tin_alph>& v, TOutputs_of_a_pattern& o) {
-        v.clear();
-        o.clear();
-        basic_string<Tfile_unit> s;
-
-        if (!getline(file, s)) {
-            return false;
-        }
-        lineno++;
-        s.push_back(' ');
-        handle_line(s, v, o);
-        return true;
     }
 
 };

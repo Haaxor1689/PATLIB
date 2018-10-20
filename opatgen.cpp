@@ -90,7 +90,7 @@ typedef word_input_file<THword, TTranslate, Tnum_type> TWord_input_file;
 typedef word_output_file<Tindex, THword, TTranslate>
 TWord_output_file;
 
-typedef Pattern_input_file<Tindex, Tin_alph, Tval_type, TTranslate,
+typedef pattern_input_file<Tindex, Tin_alph, Tval_type, TTranslate,
                            TOutputs_of_a_pattern> TPattern_input_file;
 
 typedef Pattern_output_file<Tindex, Tin_alph, Tval_type, TTranslate,
