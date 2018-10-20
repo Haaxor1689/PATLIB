@@ -13,12 +13,9 @@ namespace ptl {
     class trie_pattern_manipulator {
 
         enum {
-            min_in_alph= 0
+            min_in_alph = 0
         };
 
-        enum {
-            trie_root= 1
-        };
 
         Tpm_pointer trie_max;
         Tpm_pointer trie_bmax;
@@ -33,8 +30,6 @@ namespace ptl {
         growing_array<Tpm_pointer> trie_back;
         growing_array<char> trie_base_used;
 
-        growing_array<Tout_information> trie_outp;
-
         unsigned q_max;
         unsigned q_max_thresh;
         Tin_alph* trieq_char;
@@ -45,11 +40,12 @@ namespace ptl {
         std::vector<Tpm_pointer> pointer_stack;
         std::vector<Tpm_pointer> char_stack;
 
-    public:
-        trie_pattern_manipulator(const Tin_alph& max_i_a,
-                                 const Tout_information& out_i_z,
-                                 const unsigned& q_thr = 5):
+    protected:
+        growing_array<Tout_information> trie_outp;
+        enum { trie_root = 1 };
 
+    public:
+        trie_pattern_manipulator(const Tin_alph& max_i_a, const Tout_information& out_i_z, const unsigned& q_thr = 5) :
             max_in_alph(max_i_a), out_inf_zero(out_i_z),
             trie_char(min_in_alph), trie_link(min_in_alph),
             trie_back(min_in_alph), trie_base_used(false), trie_outp(out_inf_zero),
@@ -176,7 +172,7 @@ namespace ptl {
         }
 
     public:
-        void hard_insert_pattern(const std::vector<Tin_alph>& w, const Tout_information& o) {
+        virtual void hard_insert_pattern(const std::vector<Tin_alph>& w, const Tout_information& o) {
             if (w.empty()) {
                 return;
             }
@@ -301,7 +297,7 @@ namespace ptl {
             }
         }
 
-        void word_output(const std::vector<Tin_alph>& w, std::vector<Tout_information>& o) {
+        virtual void word_output(const std::vector<Tin_alph>& w, std::vector<Tout_information>& o) {
             o.clear();
 
             if (w.empty()) {

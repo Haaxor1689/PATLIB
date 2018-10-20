@@ -29,23 +29,15 @@ class IO_word_manipulator : public trie_pattern_manipulator<Tpm_pointer, Tin_alp
 public:
     IO_word_manipulator(const Tin_alph& max_i_a, const Tout_information& out_i_z, const unsigned& q_thr = 3) : base(max_i_a, out_i_z, q_thr) {}
 
-    void hard_insert_pattern(const vector<Tin_alph>& w, const Tout_information& o) {
-        trie_pattern_manipulator<Tpm_pointer, Tin_alph, Tout_information>::hard_insert_pattern(w, o);
-    }
-
-    void hard_insert_pattern(const Tin_alph& w, const Tout_information& o) {
+    void hard_insert_pattern(const Tin_alph& w, const Tout_information& o) override {
         vector<Tin_alph> vec;
         vec.push_back(w);
 
-        trie_pattern_manipulator<Tpm_pointer, Tin_alph, Tout_information>::hard_insert_pattern(vec, o);
+        base::hard_insert_pattern(vec, o);
     }
 
-    void word_output(const vector<Tin_alph>& w, vector<Tout_information>& o) {
-        trie_pattern_manipulator<Tpm_pointer, Tin_alph, Tout_information>::word_output(w, o);
-    }
-
-    void word_output(const Tin_alph& w, Tout_information& o) {
-        o = trie_outp[trie_root + w];
+    void word_output(const Tin_alph& w, Tout_information& o) override {
+        o = base::trie_outp[base::trie_root + w];
     }
 
 };
