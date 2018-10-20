@@ -13,6 +13,7 @@
 #include "level.hpp"
 #include "ptl_mopm.hpp"
 #include "version.hpp"
+#include "IO_word_manipulator.hpp"
 
 const char* opatgen_version = "1.0";
 const char* opatgen_cvs_id = "$Id: opatgen.w,v 1.24 2001/12/03 17:51:13 antos Exp $";
@@ -21,26 +22,6 @@ using namespace std;
 using namespace ptl;
 
 bool utf_8;
-
-template <class Tpm_pointer, class Tin_alph, class Tout_information>
-class IO_word_manipulator : public trie_pattern_manipulator<Tpm_pointer, Tin_alph, Tout_information> {
-    using base = trie_pattern_manipulator<Tpm_pointer, Tin_alph, Tout_information>;
-
-public:
-    IO_word_manipulator(const Tin_alph& max_i_a, const Tout_information& out_i_z, const unsigned& q_thr = 3) : base(max_i_a, out_i_z, q_thr) {}
-
-    void hard_insert_pattern(const Tin_alph& w, const Tout_information& o) override {
-        vector<Tin_alph> vec;
-        vec.push_back(w);
-
-        base::hard_insert_pattern(vec, o);
-    }
-
-    void word_output(const Tin_alph& w, Tout_information& o) override {
-        o = base::trie_outp[base::trie_root + w];
-    }
-
-};
 
 template <class Texternal, class Tinternal>
 class IO_reverse_mapping {
