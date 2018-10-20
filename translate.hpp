@@ -19,9 +19,11 @@ enum class char_class {
     invalid
 };
 
-template <class Tindex, class Tnum_type>
 class translate {
-    using classified_symbol = std::pair<char_class, Tnum_type>;
+    using classified_symbol = std::pair<char_class, unsigned>;
+
+    using Tindex = std::size_t;
+    using Tnum_type = unsigned;
 
     bool utf_8;
 
