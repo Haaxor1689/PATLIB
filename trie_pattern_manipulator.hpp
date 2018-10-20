@@ -4,12 +4,11 @@
 #include <vector>
 #include <set>
 
-#include "exception.hpp"
+#include "typedefs.hpp"
 #include "growing_array.hpp"
 
 namespace ptl {
 
-    template <class Tpm_pointer, class Tin_alph, class Tout_information>
     class trie_pattern_manipulator {
 
         enum {
@@ -17,40 +16,40 @@ namespace ptl {
         };
 
 
-        Tpm_pointer trie_max;
-        Tpm_pointer trie_bmax;
-        Tpm_pointer trie_count;
-        Tpm_pointer pat_count;
+        std::size_t trie_max;
+        std::size_t trie_bmax;
+        std::size_t trie_count;
+        std::size_t pat_count;
 
         const Tin_alph max_in_alph;
-        const Tout_information out_inf_zero;
+        const Tcount_pair out_inf_zero;
 
         growing_array<Tin_alph> trie_char;
-        growing_array<Tpm_pointer> trie_link;
-        growing_array<Tpm_pointer> trie_back;
+        growing_array<std::size_t> trie_link;
+        growing_array<std::size_t> trie_back;
         growing_array<char> trie_base_used;
 
         unsigned q_max;
         unsigned q_max_thresh;
         Tin_alph* trieq_char;
-        Tpm_pointer* trieq_link;
-        Tpm_pointer* trieq_back;
-        Tout_information* trieq_outp;
+        std::size_t* trieq_link;
+        std::size_t* trieq_back;
+        Tcount_pair* trieq_outp;
         
-        std::vector<Tpm_pointer> pointer_stack;
-        std::vector<Tpm_pointer> char_stack;
+        std::vector<std::size_t> pointer_stack;
+        std::vector<std::size_t> char_stack;
 
     protected:
-        growing_array<Tout_information> trie_outp;
+        growing_array<Tcount_pair> trie_outp;
         enum { trie_root = 1 };
 
     public:
-        trie_pattern_manipulator(const Tin_alph& max_i_a, const Tout_information& out_i_z, const unsigned& q_thr = 5) :
+        trie_pattern_manipulator(const Tin_alph& max_i_a, const Tcount_pair& out_i_z, const unsigned& q_thr = 5) :
             max_in_alph(max_i_a), out_inf_zero(out_i_z),
             trie_char(min_in_alph), trie_link(min_in_alph),
             trie_back(min_in_alph), trie_base_used(false), trie_outp(out_inf_zero),
             q_max_thresh(q_thr) {
-            for (Tpm_pointer c = min_in_alph; c <= max_in_alph; ++c) {
+            for (std::size_t c = min_in_alph; c <= max_in_alph; ++c) {
                 trie_char[trie_root + c] = c;
             }
 
@@ -65,9 +64,9 @@ namespace ptl {
             trie_back[trie_max + 1] = 0;
 
             trieq_char = new Tin_alph[max_in_alph + 1];
-            trieq_link = new Tpm_pointer[max_in_alph + 1];
-            trieq_back = new Tpm_pointer[max_in_alph + 1];
-            trieq_outp = new Tout_information[max_in_alph + 1];
+            trieq_link = new std::size_t[max_in_alph + 1];
+            trieq_back = new std::size_t[max_in_alph + 1];
+            trieq_outp = new Tcount_pair[max_in_alph + 1];
         }
 
         virtual ~trie_pattern_manipulator() {
@@ -86,22 +85,22 @@ namespace ptl {
                 q_max_thresh = new_q_m_t;
         }
 
-        Tpm_pointer get_trie_count() const {
+        std::size_t get_trie_count() const {
             return trie_count;
         }
 
-        Tpm_pointer get_pat_count() const {
+        std::size_t get_pat_count() const {
             return pat_count;
         }
 
-        Tpm_pointer get_max_in_alph() const {
+        std::size_t get_max_in_alph() const {
             return max_in_alph;
         }
 
     protected:
-        Tpm_pointer first_fit() {
+        std::size_t first_fit() {
             unsigned int q;
-            Tpm_pointer s, t;
+            std::size_t s, t;
 
             if (q_max > q_max_thresh) {
                 t = trie_back[trie_max + 1];
@@ -148,10 +147,10 @@ namespace ptl {
             return s;
         }
 
-        void unpack(const Tpm_pointer& s) {
+        void unpack(const std::size_t& s) {
             q_max = 1;
-            for (Tpm_pointer c = min_in_alph; c <= max_in_alph; ++c) {
-                Tpm_pointer t = s + c;
+            for (std::size_t c = min_in_alph; c <= max_in_alph; ++c) {
+                std::size_t t = s + c;
                 if (trie_char[t] == c && c != min_in_alph) {
 
                     trieq_char[q_max] = c;
@@ -172,14 +171,14 @@ namespace ptl {
         }
 
     public:
-        virtual void hard_insert_pattern(const std::vector<Tin_alph>& w, const Tout_information& o) {
+        virtual void hard_insert_pattern(const std::vector<Tin_alph>& w, const Tcount_pair& o) {
             if (w.empty()) {
                 return;
             }
 
             auto i = w.begin();
-            Tpm_pointer s = trie_root + *i;
-            Tpm_pointer t = trie_link[s];
+            std::size_t s = trie_root + *i;
+            std::size_t t = trie_link[s];
 
             while ((t > 0) && ((i + 1) != w.end())) {
                 ++i;
@@ -246,22 +245,22 @@ namespace ptl {
             char_stack.push_back(min_in_alph);
         }
 
-        bool get_next_pattern(std::vector<Tin_alph>& w, Tout_information& o) {
+        bool get_next_pattern(std::vector<Tin_alph>& w, Tcount_pair& o) {
             w.clear();
             o = out_inf_zero;
             while (true) {
                 if (pointer_stack.empty())
                     return false;
 
-                Tpm_pointer tstart = pointer_stack.back();
+                std::size_t tstart = pointer_stack.back();
                 pointer_stack.pop_back();
 
-                Tpm_pointer cstart = char_stack.back();
+                std::size_t cstart = char_stack.back();
                 char_stack.pop_back();
 
-                for (Tpm_pointer c = cstart; c <= max_in_alph; ++c) {
+                for (std::size_t c = cstart; c <= max_in_alph; ++c) {
 
-                    Tpm_pointer t = tstart + c;
+                    std::size_t t = tstart + c;
 
                     if (trie_char[t] == c && c != min_in_alph) {
 
@@ -270,10 +269,10 @@ namespace ptl {
                         if (trie_outp[t] != out_inf_zero) {
                             auto it = pointer_stack.begin();
                             auto ic = char_stack.begin();
-                            Tpm_pointer u;
+                            std::size_t u;
 
-                            for (Tpm_pointer i = 0; i < pointer_stack.size(); ++i) {
-                                u = (*it) + Tpm_pointer(*ic) - 1;
+                            for (std::size_t i = 0; i < pointer_stack.size(); ++i) {
+                                u = (*it) + std::size_t(*ic) - 1;
                                 w.push_back(trie_char[u]);
                                 ++it;
                                 ++ic;
@@ -297,7 +296,7 @@ namespace ptl {
             }
         }
 
-        virtual void word_output(const std::vector<Tin_alph>& w, std::vector<Tout_information>& o) {
+        virtual void word_output(const std::vector<Tin_alph>& w, std::vector<Tcount_pair>& o) {
             o.clear();
 
             if (w.empty()) {
@@ -305,7 +304,7 @@ namespace ptl {
             }
             
             auto i = w.begin();
-            Tpm_pointer t = trie_root;
+            std::size_t t = trie_root;
 
             do {
                 t += *i;
@@ -323,11 +322,11 @@ namespace ptl {
             }
         }
 
-        void word_last_output(const std::vector<Tin_alph>& w, Tout_information& o) {
+        void word_last_output(const std::vector<Tin_alph>& w, Tcount_pair& o) {
             // todo What?
             #if 0==1
             o = out_inf_zero;
-            std::vector<Tout_information> whole_o;
+            std::vector<Tcount_pair> whole_o;
             word_output(w,whole_o);
             if(whole_o.size()>=1)o= *(whole_o.end()-1);
             #endif
@@ -339,8 +338,8 @@ namespace ptl {
             }
             
             auto i = w.begin();
-            Tpm_pointer t = trie_root;
-            Tpm_pointer s;
+            std::size_t t = trie_root;
+            std::size_t s;
             do {
                 t += *i;
                 if (trie_char[t] == *i)
@@ -357,11 +356,11 @@ namespace ptl {
         }
 
     private:
-        bool delete_hanging_level(const Tpm_pointer& s) {
+        bool delete_hanging_level(const std::size_t& s) {
             bool all_freed = true;
-            for (Tpm_pointer c = min_in_alph; c <= max_in_alph; ++c) {
+            for (std::size_t c = min_in_alph; c <= max_in_alph; ++c) {
 
-                Tpm_pointer t = s + c;
+                std::size_t t = s + c;
                 if (trie_char[t] == c && c != min_in_alph) {
                     if (trie_link[t] != 0 && delete_hanging_level(trie_link[t])) {
                         trie_link[t] = 0;
@@ -389,9 +388,9 @@ namespace ptl {
             delete_hanging_level(trie_root);
         }
 
-        void set_of_my_outputs(std::set<Tout_information>& s) {
+        void set_of_my_outputs(std::set<Tcount_pair>& s) {
             s.clear();
-            for (Tpm_pointer i = 0; i <= trie_max; ++i) {
+            for (std::size_t i = 0; i <= trie_max; ++i) {
                 s.insert(trie_outp[i]);
             }
         }

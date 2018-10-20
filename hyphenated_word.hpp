@@ -3,6 +3,7 @@
 #include <iostream>
 #include <vector>
 
+#include "typedefs.hpp"
 #include "hyphenation_type.hpp"
 #include "growing_array.hpp"
 
@@ -15,9 +16,6 @@ namespace ptl {
 class hyphenated_word : public std::vector<unsigned> {
     using base = std::vector<unsigned>;
 
-    using Tin_alph = unsigned;
-    using Twt_type = unsigned;
-    using Tval_type = unsigned;
     
 public:
     growing_array<hyphenation_type> type;
@@ -66,8 +64,8 @@ public:
      */
     void print() {
         std::cout << "hyphenated_word";
-        for (const auto& i = base::begin(); i != base::end(); ++i)
-            std::cout << " " << *i;
+        for (const auto& i : this)
+            std::cout << " " << i;
 
         std::cout << std::endl << "dots";
         for (std::size_t i = 0; i <= this->size(); ++i)

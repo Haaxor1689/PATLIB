@@ -1,18 +1,13 @@
 #pragma once
 
+#include "typedefs.hpp"
 #include "trie_pattern_manipulator.hpp"
 
 namespace ptl {
 
-class candidate_count_trie : public trie_pattern_manipulator<std::size_t, unsigned, std::pair<unsigned, unsigned>> {
+class candidate_count_trie : public trie_pattern_manipulator {
 
-    using Tpm_pointer = std::size_t;
-    using Tin_alph = unsigned;
-    using Tcount_good = unsigned;
-    using Tcount_bad = unsigned;
-
-    using Tcount_pair = std::pair<Tcount_good, Tcount_bad>;
-    using base = trie_pattern_manipulator<Tpm_pointer, Tin_alph, Tcount_pair>;
+    using base = trie_pattern_manipulator;
 
 public:
     candidate_count_trie(const Tin_alph& max_i_a, const Tcount_good& out_i_z_good, const Tcount_bad& out_i_z_bad, const unsigned& q_thr = 3) :
@@ -29,7 +24,7 @@ public:
 
     bool get_next_pattern(std::vector<Tin_alph>& w, Tcount_good& good, Tcount_bad& bad) {
         Tcount_pair counts;
-        bool ret_val = trie_pattern_manipulator<Tpm_pointer, Tin_alph, std::pair<Tcount_good, Tcount_bad>>::get_next_pattern(w, counts);
+        bool ret_val = get_next_pattern(w, counts.first, counts.second);
         good = counts.first;
         bad = counts.second;
         return ret_val;

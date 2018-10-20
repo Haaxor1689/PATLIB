@@ -4,6 +4,7 @@
 #include <map>
 #include <set>
 
+#include "typedefs.hpp"
 #include "trie_pattern_manipulator.hpp"
 
 namespace ptl {
@@ -30,16 +31,12 @@ public:
 };
 
 class multi_output_pattern_manipulator {
-    
-    using Tindex = std::size_t;
-    using Tin_alph = unsigned;
-    using Tout_alph = unsigned;
-
-    using output_type = Outputs_of_patterns<Tindex, Tout_alph>;
+protected:
+    using output_type = Outputs_of_patterns<std::size_t, Tout_alph>;
     using output_iterator = output_type::iterator;
 
     output_type outputs;
-    trie_pattern_manipulator<Tindex, Tin_alph, output_iterator> words;
+    trie_pattern_manipulator<std::size_t, Tin_alph, output_iterator> words;
 
 public:
     multi_output_pattern_manipulator(const Tin_alph& max_i_a) : words(max_i_a, outputs.get_empty_iter()) {}
@@ -57,11 +54,11 @@ public:
 
     virtual ~multi_output_pattern_manipulator() {}
 
-    virtual Tindex get_max_in_alph() const {
+    virtual std::size_t get_max_in_alph() const {
         return words.get_max_in_alph();
     }
 
-    virtual Tindex get_pat_count() {
+    virtual std::size_t get_pat_count() {
         return words.get_pat_count();
     }
 
@@ -94,7 +91,7 @@ public:
         o = *i;
     }
 
-    void insert_pattern(const std::vector<Tin_alph>& w, const Tindex& p, const Tout_alph& v, bool with_erase = false) {
+    void insert_pattern(const std::vector<Tin_alph>& w, const std::size_t& p, const Tout_alph& v, bool with_erase = false) {
         outputs_of_a_pattern o;
 
         word_last_output(w, o);
@@ -121,7 +118,7 @@ public:
         }
     }
 
-    void delete_position(const std::vector<Tin_alph>& w, const Tindex& p) {
+    void delete_position(const std::vector<Tin_alph>& w, const std::size_t& p) {
         outputs_of_a_pattern o;
 
         word_last_output(w, o);
@@ -146,10 +143,6 @@ public:
 
 class competitive_multi_out_pat_manip : public multi_output_pattern_manipulator {
 
-    using Tindex = std::size_t;
-    using Tin_alph = unsigned;
-    using Tout_alph = unsigned;
-
     using base = multi_output_pattern_manipulator;
 
 public:
@@ -161,7 +154,7 @@ public:
 
     void competitive_pattern_output(const std::vector<Tin_alph>& w, outputs_of_a_pattern& o, const Tout_alph& ignore_bigger) {
         o.clear();
-        Tindex s = 0;
+        std::size_t s = 0;
         for (typename std::vector<Tin_alph>::const_iterator i = w.begin(); i != w.end(); ++i) {
             std::vector<Tin_alph> v(i, w.end());
             competitive_word_output(v, o, s, ignore_bigger);
@@ -170,9 +163,9 @@ public:
     }
 
 protected:
-    void competitive_word_output(const std::vector<Tin_alph>& w, outputs_of_a_pattern& o, const Tindex& s, const Tout_alph& ignore_bigger) {
-        std::vector<typename base::output_iterator> out_pointers;
-        base::words.word_output(w, out_pointers);
+    void competitive_word_output(const std::vector<Tin_alph>& w, outputs_of_a_pattern& o, const std::size_t& s, const Tout_alph& ignore_bigger) {
+        std::vector<output_iterator> out_pointers;
+        words.word_output(w, out_pointers);
         
         for (const auto& i : out_pointers) {
             for (const auto& j : i) {

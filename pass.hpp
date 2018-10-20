@@ -3,64 +3,53 @@
 #include <vector>
 #include <iostream>
 
+#include "typedefs.hpp"
 #include "hyphenation_type.hpp"
 #include "translate.hpp"
 #include "ptl_mopm.hpp"
 #include "word_input_file.hpp"
+#include "candidate_count_trie.hpp"
 
 namespace ptl {
 
 class pass {
 
-    using Tindex = std::size_t;
-    using Tin_alph = unsigned;
-    using Tval_type = unsigned;
-    using Twt_type = unsigned;
-    using Tcount_type = unsigned;
-    using THword = hyphenated_word;
-    using TTranslate = translate;
-    using TCandidate_count_structure = candidate_count_trie;
-    using TCompetitive_multi_out_pat_manip = competitive_multi_out_pat_manip;
-    using TOutputs_of_a_pattern = outputs_of_a_pattern;
-    using TWord_input_file = word_input_file;
-
-
-    TTranslate& translate;
+    translate& _translate;
     const Tval_type hyph_level;
     const Tval_type hopeless_hyph_val;
-    const Tindex left_hyphen_min;
-    const Tindex right_hyphen_min;
-    const Tindex pat_len;
-    const Tindex pat_dot;
+    const std::size_t left_hyphen_min;
+    const std::size_t right_hyphen_min;
+    const std::size_t pat_len;
+    const std::size_t pat_dot;
     const Tcount_type good_wt;
     const Tcount_type bad_wt;
     const Tcount_type thresh;
-    TCompetitive_multi_out_pat_manip& patterns;
+    competitive_multi_out_pat_manip& patterns;
 
     Tcount_type good_count;
     Tcount_type bad_count;
     Tcount_type miss_count;
-    TCandidate_count_structure candidates;
+    candidate_count_trie candidates;
 
-    TWord_input_file word_input;
+    word_input_file word_input;
 
-    Tindex hyf_min;
-    Tindex hyf_max;
-    Tindex hyf_len;
-    Tindex dot_min;
-    Tindex dot_max;
-    Tindex dot_len;
+    std::size_t hyf_min;
+    std::size_t hyf_max;
+    std::size_t hyf_len;
+    std::size_t dot_min;
+    std::size_t dot_max;
+    std::size_t dot_len;
     hyphenation_type good_dot;
     hyphenation_type bad_dot;
 
 public:
-    pass(TTranslate& tra, const char* i_d_f_n,
+    pass(translate& tra, const char* i_d_f_n,
          const Tval_type& l, const Tval_type& h,
-         const Tindex& lhm, const Tindex& rhm,
-         const Tindex& p_l, const Tindex& p_d,
+         const std::size_t& lhm, const std::size_t& rhm,
+         const std::size_t& p_l, const std::size_t& p_d,
          const Twt_type& g_w, const Twt_type& b_w, const Twt_type& t,
-         TCompetitive_multi_out_pat_manip& pat) :
-        translate(tra),
+         competitive_multi_out_pat_manip& pat) :
+        _translate(tra),
         hyph_level(l), hopeless_hyph_val(h),
         left_hyphen_min(lhm), right_hyphen_min(rhm),
         pat_len(p_l), pat_dot(p_d),
@@ -68,7 +57,7 @@ public:
         patterns(pat),
         good_count(0), bad_count(0), miss_count(0),
         candidates(patterns.get_max_in_alph(), 0, 0),
-        word_input(translate, i_d_f_n) {
+        word_input(_translate, i_d_f_n) {
         hyf_min = left_hyphen_min + 1;
         hyf_max = right_hyphen_min + 1;
         hyf_len = hyf_min + hyf_max;
@@ -94,9 +83,9 @@ public:
         }
     }
 
-    void hyphenate(THword& w) {
-        TOutputs_of_a_pattern o;
-        typename TOutputs_of_a_pattern::iterator i;
+    void hyphenate(hyphenated_word& w) {
+        outputs_of_a_pattern o;
+        outputs_of_a_pattern::iterator i;
         patterns.competitive_pattern_output(w, o, hopeless_hyph_val);
 
         for (i = o.begin(); i != o.end(); ++i) {
@@ -110,14 +99,14 @@ public:
                 i->first >= dot_min && i->first <= w.size() - dot_max) {
 
                 std::vector<Tin_alph> subw;
-                for (Tindex j = i->first + 1 - pat_dot;
+                for (std::size_t j = i->first + 1 - pat_dot;
                      j <= i->first + pat_len - pat_dot; ++j) {
                     subw.push_back(w[j]);
                 }
-                TOutputs_of_a_pattern subwo;
+                outputs_of_a_pattern subwo;
                 patterns.competitive_pattern_output(subw, subwo,
                                                     hopeless_hyph_val + 1);
-                typename TOutputs_of_a_pattern::iterator val_on_pat_dot =
+                outputs_of_a_pattern::iterator val_on_pat_dot =
                         subwo.find(pat_dot);
 
                 if (val_on_pat_dot != subwo.end())
@@ -127,8 +116,8 @@ public:
         }
     }
 
-    void change_dots(THword& w) {
-        for (Tindex i = w.size() - hyf_max; i >= hyf_min; --i) {
+    void change_dots(hyphenated_word& w) {
+        for (std::size_t i = w.size() - hyf_max; i >= hyf_min; --i) {
             if (w.level[i] % 2 == 1) {
                 if (w.type[i] == hyphenation_type::none)
                     w.type[i] = hyphenation_type::wrong;
@@ -165,7 +154,7 @@ public:
 
 private:
     void do_dictionary() {
-        THword w;
+        hyphenated_word w;
         while (word_input.get(w)) {
             if (w.size() >= hyf_len) {
                 hyphenate(w);
@@ -208,20 +197,20 @@ private:
         candidates.print_statistics();
     }
 
-    void do_word(THword& w) {
-        for (Tindex dpos = w.size() - dot_max; dpos >= dot_min; --dpos) {
+    void do_word(hyphenated_word& w) {
+        for (std::size_t dpos = w.size() - dot_max; dpos >= dot_min; --dpos) {
 
             if (w.is_knocked_out[dpos])
                 continue;
             if ((w.type[dpos] != good_dot) && (w.type[dpos] != bad_dot))
                 continue;
 
-            Tindex spos = dpos - pat_dot;
-            Tindex fpos = spos + pat_len;
+            std::size_t spos = dpos - pat_dot;
+            std::size_t fpos = spos + pat_len;
             ++spos;
 
             std::vector<Tin_alph> subw;
-            for (Tindex i = spos; i <= fpos; ++i)
+            for (std::size_t i = spos; i <= fpos; ++i)
                 subw.push_back(w[i]);
 
             if (w.type[dpos] == good_dot) {

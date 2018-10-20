@@ -5,6 +5,7 @@
 #include <iostream>
 #include <fstream>
 
+#include "hyphenation_type.hpp"
 #include "io_word_manipulator.hpp"
 #include "io_reverse_mapping.hpp"
 
@@ -20,7 +21,10 @@ enum class char_class {
 };
 
 class translate {
+public:
     using classified_symbol = std::pair<char_class, unsigned>;
+
+private:
 
     using Tindex = std::size_t;
     using Tnum_type = unsigned;
