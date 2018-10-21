@@ -11,6 +11,6 @@ enum class char_class {
 };
 
 inline bool operator==(Tcount_good lhs, char_class rhs) { return lhs == Tcount_good(rhs); }
-inline bool operator!=(Tcount_good lhs, char_class rhs) { return lhs != rhs; }
+inline bool operator!=(Tcount_good lhs, char_class rhs) { return !(lhs == rhs); }
 
 } // namespace ptl

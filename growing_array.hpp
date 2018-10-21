@@ -34,7 +34,7 @@ public:
      * \param index Index of requested element.
      * \return Reference to element on given index.
      */
-    T& operator[](std::size_t index) {
+    decltype(auto) operator[](std::size_t index) {
         if (index >= base::size()) {
             base::resize(index, default_value);
         }
