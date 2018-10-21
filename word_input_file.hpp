@@ -12,7 +12,7 @@ class word_input_file {
 
     translate& _translate;
     const std::string file_name;
-    std::basic_ifstream<unsigned char> file;
+    std::basic_ifstream<Tin_alph> file;
 
     unsigned lineno = 0;
 
@@ -23,7 +23,7 @@ public:
 
     bool get(hyphenated_word& hw) {
         hw.clear();
-        std::basic_string<unsigned char> s;
+        std::basic_string<Tin_alph> s;
 
         if (!getline(file, s)) {
             return false;
@@ -37,19 +37,19 @@ public:
     }
 
 private:
-    void handle_line(const std::basic_string<unsigned char>& s, hyphenated_word& hw) {
+    void handle_line(const std::basic_string<Tin_alph>& s, hyphenated_word& hw) {
         hw.push_back(_translate.get_edge_of_word());
         hw.weight[hw.size()] = global_word_wt;
 
-        translate::classified_symbol i_class;
+        classified_symbol i_class;
         auto i = s.begin();
-        std::vector<unsigned char> seq;
+        std::vector<Tin_alph> seq;
         unsigned num;
 
         do {
             if (utf_8 && (*i & 0x80)) {
                 {
-                    unsigned char first_i = *i;
+                    Tin_alph first_i = *i;
                     seq.clear();
                     while ((first_i & 0x80) && (*i & 0x80)) {
 
@@ -68,7 +68,7 @@ private:
                 }
             } else {
                 _translate.classify(*i, i_class);
-                switch (i_class.first) {
+                switch (char_class(i_class.first)) {
                 case char_class::space:
                     goto done;
                 case char_class::digit:
@@ -92,7 +92,7 @@ private:
                     }
                     break;
                 case char_class::hyf:
-                    if (i_class.second == hyphenation_type::correct || i_class.second == hyphenation_type::past)
+                    if (i_class.second == unsigned(hyphenation_type::correct) || i_class.second == unsigned(hyphenation_type::past))
                         hw.type[hw.size()] = hyphenation_type::correct;
                     ++i;
                     break;
@@ -108,8 +108,7 @@ private:
 
                     ++i;
                     _translate.classify(*i, i_class);
-                    while (i_class.first == char_class::letter ||
-                           i_class.first == char_class::invalid) {
+                    while (i_class.first == char_class::letter || i_class.first == char_class::invalid) {
                         seq.push_back(*i);
                         ++i;
                         _translate.classify(*i, i_class);

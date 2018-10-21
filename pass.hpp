@@ -9,6 +9,7 @@
 #include "ptl_mopm.hpp"
 #include "word_input_file.hpp"
 #include "candidate_count_trie.hpp"
+#include "char_class.hpp"
 
 namespace ptl {
 
@@ -56,7 +57,7 @@ public:
         good_wt(g_w), bad_wt(b_w), thresh(t),
         patterns(pat),
         good_count(0), bad_count(0), miss_count(0),
-        candidates(patterns.get_max_in_alph(), 0, 0),
+        candidates(patterns.get_max_in_alph(), Tcount_good(0), 0),
         word_input(_translate, i_d_f_n, utf_8) {
         hyf_min = left_hyphen_min + 1;
         hyf_max = right_hyphen_min + 1;

@@ -60,7 +60,7 @@ public:
 
     void do_all() {
         std::cout << std::endl << std::endl << "Generating level " << hyph_level << std::endl;
-        growing_array<char> more_this_level(true);
+        growing_array<bool> more_this_level(true);
         for (std::size_t pat_len = pat_start; pat_len <= pat_finish; ++pat_len) {
 
             std::size_t pat_dot = pat_len / 2;
@@ -69,21 +69,17 @@ public:
                 pat_dot = dot1 - pat_dot;
                 dot1 = pat_len * 2 - dot1 - 1;
                 if (more_this_level[pat_dot]) {
-                    pass _pass(_translate, word_input_file_name,
-                               hyph_level, hopeless_hyph_val,
-                               left_hyphen_min, right_hyphen_min,
-                               pat_len, pat_dot, good_wt,
-                               bad_wt, thresh, patterns, utf_8);
+                    pass _pass(_translate, word_input_file_name, hyph_level, hopeless_hyph_val, left_hyphen_min, right_hyphen_min, pat_len, pat_dot, good_wt, bad_wt, thresh, patterns, utf_8);
                     more_this_level[pat_dot] = _pass.do_all(level_pattern_count);
                 }
             } while (pat_dot != pat_len);
             for (std::size_t k = more_this_level.size(); k >= 1; --k)
-                if (more_this_level[k - 1] != true)
+                if (!more_this_level[k - 1])
                     more_this_level[k] = false;
         }
 
         std::size_t old_p_c = patterns.get_pat_count();
-        patterns.delete_values(hopeless_hyph_val);
+        patterns.delete_values();
         std::cout << old_p_c - patterns.get_pat_count() << " bad patterns deleted" << std::endl;
         patterns.delete_hanging();
 

@@ -15,7 +15,7 @@ class pattern_input_file {
 
     translate& _translate;
     const std::string file_name;
-    std::basic_ifstream<unsigned char> file;
+    std::basic_ifstream<Tin_alph> file;
 
     unsigned lineno = 0;
 
@@ -25,7 +25,7 @@ public:
     bool get(std::vector<Tin_alph>& v, outputs_of_a_pattern& o) {
         v.clear();
         o.clear();
-        std::basic_string<unsigned char> s;
+        std::basic_string<Tin_alph> s;
 
         if (!std::getline(file, s)) {
             return false;
@@ -38,10 +38,10 @@ public:
     }
 
 private:
-    void handle_line(const std::basic_string<unsigned char>& s, std::vector<Tin_alph>& v, outputs_of_a_pattern& o) {
-        translate::classified_symbol i_class;
+    void handle_line(const std::basic_string<Tin_alph>& s, std::vector<Tin_alph>& v, outputs_of_a_pattern& o) {
+        classified_symbol i_class;
         auto i = s.begin();
-        std::vector<unsigned char> seq;
+        std::vector<Tin_alph> seq;
         Tval_type num;
 
         std::size_t chars_read = 0;
@@ -55,7 +55,7 @@ private:
 
             if (utf_8 && *i > 127) {
 
-                unsigned char first_i = *i;
+                Tin_alph first_i = *i;
                 seq.clear();
                 while (first_i & 0x80 && *i & 0x80) {
                     seq.push_back(*i);
@@ -73,7 +73,7 @@ private:
                 }
             } else {
                 _translate.classify(*i, i_class);
-                switch (i_class.first) {
+                switch (char_class(i_class.first)) {
                 case char_class::space:
                     goto done;
                 case char_class::digit:

@@ -6,10 +6,11 @@
 
 #include "typedefs.hpp"
 #include "trie_pattern_manipulator.hpp"
+#include "char_class.hpp"
 
 namespace ptl {
 
-using outputs_of_a_pattern = std::multimap<char_class, unsigned>;
+using outputs_of_a_pattern = std::multimap<Tcount_good, Tcount_bad>;
 
 class outputs_of_patterns : public std::set<outputs_of_a_pattern> {
     
@@ -42,9 +43,8 @@ public:
 
         old.init_walk_through();
         while (old.get_next_pattern(w, o))
-            for (outputs_of_a_pattern::iterator i = o.begin();
-                 i != o.end(); ++i)
-                this->insert_pattern(w, i->first, i->second);
+            for (const auto& i : o)
+                insert_pattern(w, i.first, i.second);
     }
 
     virtual ~multi_output_pattern_manipulator() {}
@@ -74,9 +74,7 @@ public:
 
         o.clear();
         for (const auto& i : out_pointers) {
-            for (const auto& j : i) {
-                o.insert(j);
-            }
+            o.insert(i);
         }
     }
 
@@ -86,7 +84,7 @@ public:
         o = { i };
     }
 
-    void insert_pattern(const std::vector<Tin_alph>& w, char_class p, const Tout_alph& v, bool with_erase = false) {
+    void insert_pattern(const std::vector<Tin_alph>& w, Tcount_good p, const Tout_alph& v, bool with_erase = false) {
         outputs_of_a_pattern o;
 
         word_last_output(w, o);
@@ -98,7 +96,7 @@ public:
         words.hard_insert_pattern(w, *outputs.insert(o).first->begin());
     }
 
-    void delete_values(const Tout_alph& v) {
+    void delete_values() {
         std::vector<Tin_alph> w;
         outputs_of_a_pattern o;
         outputs_of_a_pattern n;
@@ -113,7 +111,7 @@ public:
         }
     }
 
-    void delete_position(const std::vector<Tin_alph>& w, char_class p) {
+    void delete_position(const std::vector<Tin_alph>& w, Tcount_good p) {
         outputs_of_a_pattern o;
 
         word_last_output(w, o);
@@ -158,22 +156,20 @@ public:
     }
 
 protected:
-    void competitive_word_output(const std::vector<Tin_alph>& w, outputs_of_a_pattern& o, const std::size_t& s, const Tout_alph& ignore_bigger) {
+    void competitive_word_output(const std::vector<Tin_alph>& w, outputs_of_a_pattern& o, std::size_t s, const Tout_alph& ignore_bigger) {
         std::vector<classified_symbol> out_pointers;
         words.word_output(w, out_pointers);
         
-        for (const auto& i : out_pointers) {
-            for (const auto& j : i) {
-                if (j.second >= ignore_bigger)
-                    continue;
-                auto oi = o.find(s + (j.first));
-                if (oi == o.end())
-                    o.insert(std::make_pair(s + (j.first), j.second));
-                else {
-                    if (oi->second < j.second) {
-                        o.erase(s + (j.first));
-                        o.insert(std::make_pair(s + (j.first), j.second));
-                    }
+        for (const auto& j : out_pointers) {
+            if (j.second >= ignore_bigger)
+                continue;
+            auto oi = o.find(s + j.first);
+            if (oi == o.end())
+                o.insert(std::make_pair(s + j.first, j.second));
+            else {
+                if (oi->second < j.second) {
+                    o.erase(s + j.first);
+                    o.insert(std::make_pair(s + j.first, j.second));
                 }
             }
         }

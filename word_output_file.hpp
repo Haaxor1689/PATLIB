@@ -11,7 +11,7 @@ class word_output_file {
 
     translate& _translate;
     const std::string file_name;
-    std::basic_ofstream<unsigned char> file;
+    std::basic_ofstream<Tin_alph> file;
 
     unsigned last_global_word_wt = 1;
     unsigned global_word_wt = 0;
@@ -20,7 +20,7 @@ public:
     word_output_file(translate& t, const char* fn) : _translate(t), file_name(fn), file(file_name) {}
 
     void put(hyphenated_word& hw) {
-        std::basic_string<unsigned char> s;
+        std::basic_string<Tin_alph> s;
 
         global_word_wt = hw.weight[0];
         if (last_global_word_wt != global_word_wt) {

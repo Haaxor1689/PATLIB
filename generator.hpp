@@ -103,10 +103,7 @@ public:
         hyphenated_word w;
         word_output_file o_f(_translate, file_name);
         word_input_file i_f(_translate, word_input_file_name, utf_8);
-        pass pass(_translate, word_input_file_name,
-                   level_value, fake_level_value,
-                   left_hyphen_min, right_hyphen_min,
-                   1, 1, 1, 1, 1, patterns);
+        pass pass(_translate, word_input_file_name, level_value, fake_level_value, left_hyphen_min, right_hyphen_min, 1, 1, 1, 1, 1, patterns, utf_8);
         while (i_f.get(w)) {
             if (w.size() > 2) {
                 pass.hyphenate(w);
@@ -124,9 +121,7 @@ public:
         Tval_type hopeless_fake_number = 2 * ((hyph_finish / 2) + 1);
 
         for (Tval_type l = hyph_start; l <= hyph_finish; ++l) {
-            level _level(_translate, word_input_file_name,
-                         l, hopeless_fake_number, left_hyphen_min,
-                         right_hyphen_min, patterns);
+            level _level(_translate, word_input_file_name, l, hopeless_fake_number, left_hyphen_min, right_hyphen_min, patterns, utf_8);
             _level.do_all();
         }
         output_patterns();

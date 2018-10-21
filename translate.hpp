@@ -9,17 +9,9 @@
 #include "hyphenation_type.hpp"
 #include "io_word_manipulator.hpp"
 #include "io_reverse_mapping.hpp"
+#include "char_class.hpp"
 
 namespace ptl {
-
-enum class char_class {
-    space,
-    digit,
-    hyf,
-    letter,
-    escape,
-    invalid
-};
 
 class translate {
 
@@ -31,7 +23,7 @@ class translate {
     std::size_t left_hyphen_min;
     std::size_t right_hyphen_min;
 
-    io_word_manipulator classified_symbols { 255, std::make_pair(char_class::invalid, 0), 0 };
+    io_word_manipulator classified_symbols { 255, std::make_pair(Tin_alph(char_class::invalid), 0), 0 };
 
     io_reverse_mapping<Tin_alph, Tin_alph> xdig;
     io_reverse_mapping<Tin_alph, hyphenation_type> xhyf;
@@ -97,14 +89,14 @@ protected:
         std::vector<Tin_alph> repres;
 
         for (d = 0; d <= 9; ++d) {
-            classified_symbols.hard_insert_pattern({ d + '0' }, std::make_pair(char_class::digit, d));
+            classified_symbols.hard_insert_pattern({ d + '0' }, std::make_pair(Tin_alph(char_class::digit), d));
             repres.clear();
             repres.push_back(d + '0');
             xdig.insert(d, repres);
         }
 
-        classified_symbols.hard_insert_pattern({ ' ' }, std::make_pair(char_class::space, 0));
-        classified_symbols.hard_insert_pattern({ 9 }, std::make_pair(char_class::space, 0));
+        classified_symbols.hard_insert_pattern({ ' ' }, std::make_pair(Tin_alph(char_class::space), 0));
+        classified_symbols.hard_insert_pattern({ 9 }, std::make_pair(Tin_alph(char_class::space), 0));
 
         edge_of_word = get_next_internal_code();
 
@@ -116,15 +108,15 @@ protected:
     void prepare_default_hyfs() {
         std::vector<Tin_alph> repres;
 
-        classified_symbols.hard_insert_pattern({ '.' }, std::make_pair(char_class::hyf, 1 /*hyphenation_type::wrong*/));
+        classified_symbols.hard_insert_pattern({ '.' }, std::make_pair(Tin_alph(char_class::hyf), unsigned(hyphenation_type::wrong)));
         repres.clear();
         repres.push_back('.');
         xhyf.insert(hyphenation_type::wrong, repres);
-        classified_symbols.hard_insert_pattern({ '-' }, std::make_pair(char_class::hyf, 2 /*hyphenation_type::correct*/));
+        classified_symbols.hard_insert_pattern({ '-' }, std::make_pair(Tin_alph(char_class::hyf), unsigned(hyphenation_type::correct)));
         repres.clear();
         repres.push_back('-');
         xhyf.insert(hyphenation_type::correct, repres);
-        classified_symbols.hard_insert_pattern({ '*' }, std::make_pair(char_class::hyf, 3 /*hyphenation_type::past*/));
+        classified_symbols.hard_insert_pattern({ '*' }, std::make_pair(Tin_alph(char_class::hyf),unsigned(hyphenation_type::past)));
         repres.clear();
         repres.push_back('*');
         xhyf.insert(hyphenation_type::past, repres);
@@ -135,8 +127,8 @@ protected:
 
         for (Tin_alph c = 'a'; c <= 'z'; c++) {
             Tin_alph internal = get_next_internal_code();
-            classified_symbols.hard_insert_pattern({ c }, std::make_pair(char_class::letter, internal));
-            classified_symbols.hard_insert_pattern({ c + 'A' - 'a' }, std::make_pair(char_class::letter, internal));
+            classified_symbols.hard_insert_pattern({ c }, std::make_pair(Tin_alph(char_class::letter), internal));
+            classified_symbols.hard_insert_pattern({ c + 'A' - 'a' }, std::make_pair(Tin_alph(char_class::letter), internal));
             repres.clear();
             repres.push_back(c);
             xext.insert(internal, repres);
@@ -209,11 +201,11 @@ protected:
             } while (n1 <= 0);
         }
 
-        for (std::size_t i = 1 /*hyphenation_type::wrong*/; i <= 3 /*hyphenation_type::past*/; ++i) {
+        for (auto i = unsigned(hyphenation_type::wrong); i <= unsigned(hyphenation_type::past); ++i) {
             if (s.length() - 1 >= i + 3) {
                 classify(s[i + 3], cs);
                 if (utf_8 && s[i + 3] > 0x80) {
-                    throw ptl::exception("! Error reading translate file, In the first line, "
+                    throw exception("! Error reading translate file, In the first line, "
                         "specifying hyf characters:\n"
                         "In UTF-8 mode 8-bit symbol is not allowed.");
                 }
@@ -224,10 +216,9 @@ protected:
                     std::vector<Tin_alph> v;
                     v.push_back(s[i + 3]);
                     xhyf.insert(static_cast<hyphenation_type>(i), v);
-                    classified_symbols.hard_insert_pattern({ s[i + 3] }, std::make_pair(char_class::hyf, i));
+                    classified_symbols.hard_insert_pattern({ s[i + 3] }, std::make_pair(Tin_alph(char_class::hyf), i));
                 } else {
-                    throw exception("! Error reading translate file. In the first line, specifying hyf characters:\n"
-                                         "Specified symbol has been already assigned.");
+                    throw exception("! Error reading translate file. In the first line, specifying hyf characters:\nSpecified symbol has been already assigned.");
                 }
             }
         }
@@ -268,7 +259,7 @@ protected:
                     std::cout << "in UTF-8 mode" << std::endl;
                 }
                 if (cs.first == char_class::invalid) {
-                    classified_symbols.hard_insert_pattern(letter_repres, std::make_pair(char_class::letter, internal));
+                    classified_symbols.hard_insert_pattern(letter_repres, std::make_pair(Tin_alph(char_class::letter), internal));
                 } else {
                     std::cerr << "! Error: Translate file, line " << lineno << ":" << std::endl;
                     std::cerr << "Trying to redefine previously defined character" << std::endl;
@@ -277,7 +268,7 @@ protected:
             } else {
                 classify(*letter_repres.begin(), cs);
                 if (cs.first == char_class::invalid)
-                    classified_symbols.hard_insert_pattern({ letter_repres[0] }, std::make_pair(char_class::escape, 0));
+                    classified_symbols.hard_insert_pattern({ letter_repres[0] }, std::make_pair(Tin_alph(char_class::escape), 0));
                 classify(*letter_repres.begin(), cs);
                 if (cs.first != char_class::escape) {
                     std::cerr << "! Error: Translate file, line " << lineno << ":" << std::endl;
@@ -306,7 +297,7 @@ protected:
                     }
                 }
 
-                classified_symbols.hard_insert_pattern(letter_repres, std::make_pair(char_class::letter, internal));
+                classified_symbols.hard_insert_pattern(letter_repres, std::make_pair(Tin_alph(char_class::letter), internal));
             }
             if (primary_repres)
                 xext.insert(internal, letter_repres);

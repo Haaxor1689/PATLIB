@@ -6,7 +6,6 @@
 namespace ptl {
 
 class candidate_count_trie : public trie_pattern_manipulator {
-
     using base = trie_pattern_manipulator;
 
 public:
@@ -17,7 +16,7 @@ public:
         Tcount_pair counts;
 
         word_last_output(w, counts);
-        counts.first += good_inc;
+        counts.first = Tcount_good(unsigned(counts.first) + unsigned(good_inc));
         counts.second += bad_inc;
         hard_insert_pattern(w, counts);
     }
