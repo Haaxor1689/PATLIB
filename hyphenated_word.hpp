@@ -64,7 +64,7 @@ public:
      */
     void print() {
         std::cout << "hyphenated_word";
-        for (const auto& i : this)
+        for (const auto& i : *this)
             std::cout << " " << i;
 
         std::cout << std::endl << "dots";

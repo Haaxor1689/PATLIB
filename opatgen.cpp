@@ -22,9 +22,11 @@ void print_banner() {
 }
 
 int main(int argc, char* argv[]) {
+    using namespace std::string_literals;
+
     std::cout << "This is OPATGEN, version " << opatgen_version << std::endl;
 
-    if (argc >= 2 && (0 == strcmp(argv[1], "--help"))) {
+    if (argc >= 2 && argv[1] == "--help"s) {
         std::cout << "Usage: opatgen [-u8] DICTIONARY PATTERNS OUTPUT TRANSLATE" << std::endl;
         std::cout << "  Generate the OUTPUT hyphenation file from the" << std::endl;
         std::cout << "  DICTIONARY, PATTERNS, and TRANSLATE files." << std::endl << std::endl;
@@ -35,7 +37,7 @@ int main(int argc, char* argv[]) {
         return 0;
     }
 
-    if (argc >= 2 && (0 == strcmp(argv[1], "--version"))) {
+    if (argc >= 2 && argv[1] == "--version"s) {
         std::cout << "(CVS: " << opatgen_cvs_id << ")" << std::endl;
         std::cout << "with PATLIB, version " << patlib_version << std::endl;
         std::cout << "(CVS: " << patlib_cvs_id << ")" << std::endl;

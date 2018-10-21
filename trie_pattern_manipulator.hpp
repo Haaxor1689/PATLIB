@@ -22,7 +22,7 @@ namespace ptl {
         std::size_t pat_count;
 
         const Tin_alph max_in_alph;
-        const Tcount_pair out_inf_zero;
+        const classified_symbol out_inf_zero;
 
         growing_array<Tin_alph> trie_char;
         growing_array<std::size_t> trie_link;
@@ -34,17 +34,17 @@ namespace ptl {
         Tin_alph* trieq_char;
         std::size_t* trieq_link;
         std::size_t* trieq_back;
-        Tcount_pair* trieq_outp;
+        classified_symbol* trieq_outp;
         
         std::vector<std::size_t> pointer_stack;
         std::vector<std::size_t> char_stack;
 
     protected:
-        growing_array<Tcount_pair> trie_outp;
+        growing_array<classified_symbol> trie_outp;
         enum { trie_root = 1 };
 
     public:
-        trie_pattern_manipulator(const Tin_alph& max_i_a, const Tcount_pair& out_i_z, const unsigned& q_thr = 5) :
+        trie_pattern_manipulator(const Tin_alph& max_i_a, const classified_symbol& out_i_z, const unsigned& q_thr = 5) :
             max_in_alph(max_i_a), out_inf_zero(out_i_z),
             trie_char(min_in_alph), trie_link(min_in_alph),
             trie_back(min_in_alph), trie_base_used(false), trie_outp(out_inf_zero),
@@ -66,7 +66,7 @@ namespace ptl {
             trieq_char = new Tin_alph[max_in_alph + 1];
             trieq_link = new std::size_t[max_in_alph + 1];
             trieq_back = new std::size_t[max_in_alph + 1];
-            trieq_outp = new Tcount_pair[max_in_alph + 1];
+            trieq_outp = new classified_symbol[max_in_alph + 1];
         }
 
         virtual ~trie_pattern_manipulator() {
@@ -171,7 +171,7 @@ namespace ptl {
         }
 
     public:
-        virtual void hard_insert_pattern(const std::vector<Tin_alph>& w, const Tcount_pair& o) {
+        void hard_insert_pattern(const std::vector<Tin_alph>& w, const classified_symbol& o) {
             if (w.empty()) {
                 return;
             }
@@ -245,7 +245,7 @@ namespace ptl {
             char_stack.push_back(min_in_alph);
         }
 
-        bool get_next_pattern(std::vector<Tin_alph>& w, Tcount_pair& o) {
+        bool get_next_pattern(std::vector<Tin_alph>& w, classified_symbol& o) {
             w.clear();
             o = out_inf_zero;
             while (true) {
@@ -296,7 +296,7 @@ namespace ptl {
             }
         }
 
-        virtual void word_output(const std::vector<Tin_alph>& w, std::vector<Tcount_pair>& o) {
+        void word_output(const std::vector<Tin_alph>& w, std::vector<classified_symbol>& o) {
             o.clear();
 
             if (w.empty()) {
@@ -322,11 +322,11 @@ namespace ptl {
             }
         }
 
-        void word_last_output(const std::vector<Tin_alph>& w, Tcount_pair& o) {
+        void word_last_output(const std::vector<Tin_alph>& w, classified_symbol& o) {
             // todo What?
             #if 0==1
             o = out_inf_zero;
-            std::vector<Tcount_pair> whole_o;
+            std::vector<classified_symbol> whole_o;
             word_output(w,whole_o);
             if(whole_o.size()>=1)o= *(whole_o.end()-1);
             #endif
@@ -388,7 +388,7 @@ namespace ptl {
             delete_hanging_level(trie_root);
         }
 
-        void set_of_my_outputs(std::set<Tcount_pair>& s) {
+        void set_of_my_outputs(std::set<classified_symbol>& s) {
             s.clear();
             for (std::size_t i = 0; i <= trie_max; ++i) {
                 s.insert(trie_outp[i]);

@@ -5,6 +5,7 @@
 #include <iostream>
 #include <fstream>
 
+#include "typedefs.hpp"
 #include "hyphenation_type.hpp"
 #include "io_word_manipulator.hpp"
 #include "io_reverse_mapping.hpp"
@@ -21,27 +22,20 @@ enum class char_class {
 };
 
 class translate {
-public:
-    using classified_symbol = std::pair<char_class, unsigned>;
-
-private:
-
-    using Tindex = std::size_t;
-    using Tnum_type = unsigned;
 
     bool utf_8;
 
-    Tnum_type edge_of_word;
+    Tin_alph edge_of_word;
 
-    Tindex max_in_alph = 0;
-    Tindex left_hyphen_min;
-    Tindex right_hyphen_min;
+    std::size_t max_in_alph = 0;
+    std::size_t left_hyphen_min;
+    std::size_t right_hyphen_min;
 
-    io_word_manipulator<Tindex, unsigned char, classified_symbol> classified_symbols{ 255, std::make_pair(char_class::invalid, 0) };
+    io_word_manipulator classified_symbols { 255, std::make_pair(char_class::invalid, 0), 0 };
 
-    io_reverse_mapping<unsigned char, Tnum_type> xdig;
-    io_reverse_mapping<unsigned char, hyphenation_type> xhyf;
-    io_reverse_mapping<unsigned char, Tnum_type> xext;
+    io_reverse_mapping<Tin_alph, Tin_alph> xdig;
+    io_reverse_mapping<Tin_alph, hyphenation_type> xhyf;
+    io_reverse_mapping<Tin_alph, Tin_alph> xext;
 
 public:
 
@@ -51,106 +45,106 @@ public:
         read_translate(tra);
     }
 
-    void classify(unsigned char c, classified_symbol& o) {
+    void classify(Tin_alph c, classified_symbol& o) {
         classified_symbols.word_output(c, o);
     }
 
-    void classify(const std::vector<unsigned char>& vc, classified_symbol& o) {
+    void classify(const std::vector<Tin_alph>& vc, classified_symbol& o) {
         classified_symbols.word_last_output(vc, o);
     }
 
-    Tindex get_max_in_alph() {
+    std::size_t get_max_in_alph() {
         return max_in_alph;
     }
 
-    Tindex get_right_hyphen_min() {
+    std::size_t get_right_hyphen_min() {
         return right_hyphen_min;
     }
 
-    Tindex get_left_hyphen_min() {
+    std::size_t get_left_hyphen_min() {
         return left_hyphen_min;
     }
 
-    unsigned char get_edge_of_word() {
+    Tin_alph get_edge_of_word() {
         return edge_of_word;
     }
 
-    void get_xdig(Tnum_type i, std::basic_string<unsigned char>& e) {
-        std::basic_string<unsigned char> inv_rep;
+    void get_xdig(Tin_alph i, std::basic_string<Tin_alph>& e) {
+        std::basic_string<Tin_alph> inv_rep;
         while (i > 0) {
             xdig.add_to_string((i % 10), inv_rep);
-            i = Tnum_type(i / 10);
+            i = Tin_alph(i / 10);
         }
         e.append(inv_rep.rbegin(), inv_rep.rend());
     }
 
-    void get_xhyf(hyphenation_type i, std::basic_string<unsigned char>& e) {
+    void get_xhyf(hyphenation_type i, std::basic_string<Tin_alph>& e) {
         xhyf.add_to_string(i, e);
     }
 
-    void get_xext(const Tnum_type& i, std::basic_string<unsigned char>& e) {
+    void get_xext(const Tin_alph& i, std::basic_string<Tin_alph>& e) {
         xext.add_to_string(i, e);
     }
 
 protected:
 
-    Tnum_type get_next_internal_code() {
+    Tin_alph get_next_internal_code() {
         return ++max_in_alph;
     }
 
     void prepare_fixed_defaults() {
-        Tnum_type d;
-        std::vector<unsigned char> repres;
+        Tin_alph d;
+        std::vector<Tin_alph> repres;
 
         for (d = 0; d <= 9; ++d) {
-            classified_symbols.hard_insert_pattern((d + '0'), std::make_pair(char_class::digit, d));
+            classified_symbols.hard_insert_pattern({ d + '0' }, std::make_pair(char_class::digit, d));
             repres.clear();
             repres.push_back(d + '0');
             xdig.insert(d, repres);
         }
 
-        classified_symbols.hard_insert_pattern(' ', std::make_pair(char_class::space, 0));
-        classified_symbols.hard_insert_pattern(9, std::make_pair(char_class::space, 0));
+        classified_symbols.hard_insert_pattern({ ' ' }, std::make_pair(char_class::space, 0));
+        classified_symbols.hard_insert_pattern({ 9 }, std::make_pair(char_class::space, 0));
 
         edge_of_word = get_next_internal_code();
 
-        std::vector<unsigned char> edge_of_word_printable;
+        std::vector<Tin_alph> edge_of_word_printable;
         edge_of_word_printable.push_back('.');
         xext.insert(edge_of_word, edge_of_word_printable);
     }
 
     void prepare_default_hyfs() {
-        std::vector<unsigned char> repres;
+        std::vector<Tin_alph> repres;
 
-        classified_symbols.hard_insert_pattern('.', std::make_pair(char_class::hyf, hyphenation_type::wrong));
+        classified_symbols.hard_insert_pattern({ '.' }, std::make_pair(char_class::hyf, 1 /*hyphenation_type::wrong*/));
         repres.clear();
         repres.push_back('.');
         xhyf.insert(hyphenation_type::wrong, repres);
-        classified_symbols.hard_insert_pattern('-', std::make_pair(char_class::hyf, hyphenation_type::correct));
+        classified_symbols.hard_insert_pattern({ '-' }, std::make_pair(char_class::hyf, 2 /*hyphenation_type::correct*/));
         repres.clear();
         repres.push_back('-');
         xhyf.insert(hyphenation_type::correct, repres);
-        classified_symbols.hard_insert_pattern('*', std::make_pair(char_class::hyf, hyphenation_type::past));
+        classified_symbols.hard_insert_pattern({ '*' }, std::make_pair(char_class::hyf, 3 /*hyphenation_type::past*/));
         repres.clear();
         repres.push_back('*');
         xhyf.insert(hyphenation_type::past, repres);
     }
 
     void prepare_default_alphabet() {
-        std::vector<unsigned char> repres;
+        std::vector<Tin_alph> repres;
 
-        for (unsigned char c = 'a'; c <= 'z'; c++) {
-            Tnum_type internal = get_next_internal_code();
-            classified_symbols.hard_insert_pattern(c, std::make_pair(char_class::letter, internal));
-            classified_symbols.hard_insert_pattern(c + 'A' - 'a', std::make_pair(char_class::letter, internal));
+        for (Tin_alph c = 'a'; c <= 'z'; c++) {
+            Tin_alph internal = get_next_internal_code();
+            classified_symbols.hard_insert_pattern({ c }, std::make_pair(char_class::letter, internal));
+            classified_symbols.hard_insert_pattern({ c + 'A' - 'a' }, std::make_pair(char_class::letter, internal));
             repres.clear();
             repres.push_back(c);
             xext.insert(internal, repres);
         }
     }
 
-    void handle_preamble_of_translate(const std::basic_string<unsigned char>& s) {
-        Tindex n = 0;
+    void handle_preamble_of_translate(const std::basic_string<Tin_alph>& s) {
+        std::size_t n = 0;
         bool bad = false;
         classified_symbol cs;
 
@@ -199,10 +193,9 @@ protected:
         }
 
         if (bad) {
-            Tindex n1;
-            Tindex n2;
-            std::cout << "! Values of left_hyphen_min and right_hyphen_min in translate";
-            std::cout << " are invalid." << std::endl;
+            std::size_t n1;
+            std::size_t n2;
+            std::cout << "! Values of left_hyphen_min and right_hyphen_min in translate are invalid." << std::endl;
             do {
                 std::cout << "left_hyphen_min, right_hyphen_min: ";
                 std::cin >> n1 >> n2;
@@ -213,12 +206,10 @@ protected:
                     n1 = 0;
                     std::cout << "Specify 1<=left_hyphen_min, right_hyphen_min!" << std::endl;
                 }
-            } while (!n1 > 0);
+            } while (n1 <= 0);
         }
 
-        // todo enum loop?
-        for (Tindex i = hyphenation_type::wrong; i <= hyphenation_type::past; ++i) {
-
+        for (std::size_t i = 1 /*hyphenation_type::wrong*/; i <= 3 /*hyphenation_type::past*/; ++i) {
             if (s.length() - 1 >= i + 3) {
                 classify(s[i + 3], cs);
                 if (utf_8 && s[i + 3] > 0x80) {
@@ -230,10 +221,10 @@ protected:
                     continue;
                 if (cs.first == char_class::invalid) {
 
-                    std::vector<unsigned char> v;
+                    std::vector<Tin_alph> v;
                     v.push_back(s[i + 3]);
                     xhyf.insert(static_cast<hyphenation_type>(i), v);
-                    classified_symbols.hard_insert_pattern(s[i + 3], std::make_pair(char_class::hyf, i));
+                    classified_symbols.hard_insert_pattern({ s[i + 3] }, std::make_pair(char_class::hyf, i));
                 } else {
                     throw exception("! Error reading translate file. In the first line, specifying hyf characters:\n"
                                          "Specified symbol has been already assigned.");
@@ -242,14 +233,14 @@ protected:
         }
     }
 
-    void handle_line_of_translate(std::basic_string<unsigned char>& s, const unsigned& lineno) {
+    void handle_line_of_translate(std::basic_string<Tin_alph>& s, const unsigned& lineno) {
         if (s.length() == 0) {
             return;
         }
 
         bool primary_repres = true;
-        std::vector<unsigned char> letter_repres;
-        Tnum_type internal;
+        std::vector<Tin_alph> letter_repres;
+        Tin_alph internal;
         auto delimiter = *s.begin();
 
         s += delimiter + delimiter;
@@ -277,8 +268,7 @@ protected:
                     std::cout << "in UTF-8 mode" << std::endl;
                 }
                 if (cs.first == char_class::invalid) {
-                    classified_symbols.hard_insert_pattern(letter_repres,
-                                                           std::make_pair(char_class::letter, internal));
+                    classified_symbols.hard_insert_pattern(letter_repres, std::make_pair(char_class::letter, internal));
                 } else {
                     std::cerr << "! Error: Translate file, line " << lineno << ":" << std::endl;
                     std::cerr << "Trying to redefine previously defined character" << std::endl;
@@ -287,7 +277,7 @@ protected:
             } else {
                 classify(*letter_repres.begin(), cs);
                 if (cs.first == char_class::invalid)
-                    classified_symbols.hard_insert_pattern(*letter_repres.begin(), std::make_pair(char_class::escape, 0));
+                    classified_symbols.hard_insert_pattern({ letter_repres[0] }, std::make_pair(char_class::escape, 0));
                 classify(*letter_repres.begin(), cs);
                 if (cs.first != char_class::escape) {
                     std::cerr << "! Error: Translate file, line " << lineno << ":" << std::endl;
@@ -304,7 +294,7 @@ protected:
                 }
 
                 if (utf_8) {
-                    unsigned char first = *letter_repres.begin();
+                    Tin_alph first = *letter_repres.begin();
                     unsigned expected_length = 0;
                     while (first & 0x80) {
                         expected_length++;
@@ -316,8 +306,7 @@ protected:
                     }
                 }
 
-                classified_symbols.hard_insert_pattern(letter_repres,
-                                                       std::make_pair(char_class::letter, internal));
+                classified_symbols.hard_insert_pattern(letter_repres, std::make_pair(char_class::letter, internal));
             }
             if (primary_repres)
                 xext.insert(internal, letter_repres);
@@ -328,8 +317,8 @@ protected:
 
     void read_translate(const std::string& tra) {
         unsigned lineno = 1;
-        std::basic_ifstream<unsigned char> transl(tra);
-        std::basic_string<unsigned char> s;
+        std::basic_ifstream<Tin_alph> transl(tra);
+        std::basic_string<Tin_alph> s;
 
         if (std::getline(transl, s)) {
             handle_preamble_of_translate(s);

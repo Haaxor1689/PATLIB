@@ -9,19 +9,16 @@
 
 namespace ptl {
 
-using outputs_of_a_pattern = std::multimap<std::size_t, unsigned>;
+using outputs_of_a_pattern = std::multimap<char_class, unsigned>;
 
-template <class Tposition, class Toutput>
-class Outputs_of_patterns : public std::set<outputs_of_a_pattern> {
-    using base = std::set<outputs_of_a_pattern>;
-    using node_iterator = outputs_of_a_pattern::iterator;
+class outputs_of_patterns : public std::set<outputs_of_a_pattern> {
     
-    node_iterator empty_iter;
+    classified_symbol empty_iter;
 
 public:
-    Outputs_of_patterns() : empty_iter(insert(outputs_of_a_pattern()).first) {}
+    outputs_of_patterns() : empty_iter(*insert(outputs_of_a_pattern()).first->begin()) {}
 
-    auto get_empty_iter() const {
+    classified_symbol get_empty_iter() const {
         return empty_iter;
     }
 
@@ -32,11 +29,9 @@ public:
 
 class multi_output_pattern_manipulator {
 protected:
-    using output_type = Outputs_of_patterns<std::size_t, Tout_alph>;
-    using output_iterator = output_type::iterator;
 
-    output_type outputs;
-    trie_pattern_manipulator<std::size_t, Tin_alph, output_iterator> words;
+    outputs_of_patterns outputs;
+    trie_pattern_manipulator words;
 
 public:
     multi_output_pattern_manipulator(const Tin_alph& max_i_a) : words(max_i_a, outputs.get_empty_iter()) {}
@@ -67,14 +62,14 @@ public:
     }
 
     virtual bool get_next_pattern(std::vector<Tin_alph>& w, outputs_of_a_pattern& o) {
-        output_iterator i;
+        classified_symbol i;
         bool ret_val = words.get_next_pattern(w, i);
-        o = *i;
+        o = { i };
         return ret_val;
     }
 
     void word_output(const std::vector<Tin_alph>& w, outputs_of_a_pattern& o) {
-        std::vector<output_iterator> out_pointers;
+        std::vector<classified_symbol> out_pointers;
         words.word_output(w, out_pointers);
 
         o.clear();
@@ -86,12 +81,12 @@ public:
     }
 
     void word_last_output(const std::vector<Tin_alph>& w, outputs_of_a_pattern& o) {
-        output_iterator i;
+        classified_symbol i;
         words.word_last_output(w, i);
-        o = *i;
+        o = { i };
     }
 
-    void insert_pattern(const std::vector<Tin_alph>& w, const std::size_t& p, const Tout_alph& v, bool with_erase = false) {
+    void insert_pattern(const std::vector<Tin_alph>& w, char_class p, const Tout_alph& v, bool with_erase = false) {
         outputs_of_a_pattern o;
 
         word_last_output(w, o);
@@ -100,7 +95,7 @@ public:
         }
         o.insert(std::make_pair(p, v));
 
-        words.hard_insert_pattern(w, outputs.insert(o).first);
+        words.hard_insert_pattern(w, *outputs.insert(o).first->begin());
     }
 
     void delete_values(const Tout_alph& v) {
@@ -114,16 +109,16 @@ public:
             for (const auto& i : o) {
                 n.insert(i);
             }
-            words.hard_insert_pattern(w, outputs.insert(n).first);
+            words.hard_insert_pattern(w, *outputs.insert(n).first->begin());
         }
     }
 
-    void delete_position(const std::vector<Tin_alph>& w, const std::size_t& p) {
+    void delete_position(const std::vector<Tin_alph>& w, char_class p) {
         outputs_of_a_pattern o;
 
         word_last_output(w, o);
         o.erase(p);
-        words.hard_insert_pattern(w, outputs.insert(o).first);
+        words.hard_insert_pattern(w, *outputs.insert(o).first->begin());
     }
 
     void delete_pattern(std::vector<Tin_alph>& w) {
@@ -155,7 +150,7 @@ public:
     void competitive_pattern_output(const std::vector<Tin_alph>& w, outputs_of_a_pattern& o, const Tout_alph& ignore_bigger) {
         o.clear();
         std::size_t s = 0;
-        for (typename std::vector<Tin_alph>::const_iterator i = w.begin(); i != w.end(); ++i) {
+        for (auto i = w.begin(); i != w.end(); ++i) {
             std::vector<Tin_alph> v(i, w.end());
             competitive_word_output(v, o, s, ignore_bigger);
             ++s;
@@ -164,7 +159,7 @@ public:
 
 protected:
     void competitive_word_output(const std::vector<Tin_alph>& w, outputs_of_a_pattern& o, const std::size_t& s, const Tout_alph& ignore_bigger) {
-        std::vector<output_iterator> out_pointers;
+        std::vector<classified_symbol> out_pointers;
         words.word_output(w, out_pointers);
         
         for (const auto& i : out_pointers) {

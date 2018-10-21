@@ -13,5 +13,8 @@ using Tcount_good = unsigned;
 using Tcount_bad = unsigned;
 
 using Tcount_pair = std::pair<Tcount_good, Tcount_bad>;
+    
+enum class char_class;
+using classified_symbol = std::pair<char_class, unsigned>;
 
 }

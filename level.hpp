@@ -10,6 +10,8 @@ namespace ptl {
 
 class level {
 
+    bool utf_8;
+
     translate& _translate;
     const std::string word_input_file_name;
     const Tval_type hyph_level;
@@ -28,7 +30,8 @@ public:
     level(translate& tra, const std::string& i_d_f_n,
           const Tval_type& l, const Tval_type& h,
           const std::size_t& lhm, const std::size_t& rhm,
-          competitive_multi_out_pat_manip& p):
+          competitive_multi_out_pat_manip& p, bool utf_8):
+        utf_8(utf_8),
         _translate(tra), word_input_file_name(i_d_f_n),
         hyph_level(l), hopeless_hyph_val(h),
         left_hyphen_min(lhm), right_hyphen_min(rhm),
@@ -70,7 +73,7 @@ public:
                                hyph_level, hopeless_hyph_val,
                                left_hyphen_min, right_hyphen_min,
                                pat_len, pat_dot, good_wt,
-                               bad_wt, thresh, patterns);
+                               bad_wt, thresh, patterns, utf_8);
                     more_this_level[pat_dot] = _pass.do_all(level_pattern_count);
                 }
             } while (pat_dot != pat_len);
